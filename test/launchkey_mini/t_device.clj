@@ -1,5 +1,6 @@
 (ns launchkey-mini.t-device
   (:require [midje.sweet :refer :all]
+            [overtone.studio.midi :refer :all :as midi]
             [launchkey-mini.device :as device]))
 
 (fact "correct side controls"
@@ -17,3 +18,14 @@
 
 (fact "side->row returns nil on wrong row"
   (device/side->row :knob1) => nil)
+
+(fact "enable-incontrol-msg has correct content"
+  (#'device/enable-incontrol-msg :note) => 0x0C
+  (#'device/enable-incontrol-msg :velocity) => 0x7F
+  (#'device/enable-incontrol-msg :type) => :note-on)
+
+(fact "disable-incontrol-msg has correct content"
+  (#'device/disable-incontrol-msg :note) => 0x0C
+  (#'device/disable-incontrol-msg :velocity) => 0x0
+  (#'device/disable-incontrol-msg :type) => :note-on)
+

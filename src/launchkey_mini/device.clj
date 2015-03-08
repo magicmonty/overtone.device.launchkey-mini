@@ -1,9 +1,6 @@
 (ns launchkey-mini.device
   (:require
-   [overtone.studio.midi :refer :all]
-   [overtone.libs.event :refer :all]
-
-   [launchkey-mini.led :as led]))
+    [launchkey-mini.midi :as midi]))
 
 (def launchkey-mini-config {
   :name "LK Mini InControl"
@@ -34,13 +31,21 @@
       :type :midi-out
       :midi-handle "LK Mini InControl"
       :controls {
-        :row1  {:note 104 :fn midi-note-on}
-        :row2  {:note 120 :fn midi-note-on}}
+        :row1  {:note 104 :type :note-on}
+        :row2  {:note 120 :type :note-on}}
       :grid {
-        :fn midi-note-on}}}})
+        :type :note-on}}
+
+    :midi-messages {
+      :enable-incontrol  {:type :note-on :note 0x0C :velocity 0x7F}
+      :disable-incontrol {:type :note-on :note 0x0C :velocity 0x0}}}})
 
 (def side-controls (-> launchkey-mini-config :interfaces :grid-controls :side-controls keys))
 (def knobs (-> launchkey-mini-config :interfaces :grid-controls :knobs keys))
 (def meta-keys (-> launchkey-mini-config :interfaces :grid-controls :meta-keys keys))
-
 (defn side->row [name] (-> launchkey-mini-config :interfaces :grid-controls :side-controls name :row))
+
+(defn- midi-msg [name] (-> launchkey-mini-config :interfaces :midi-messages name))
+(def enable-incontrol-msg (midi-msg :enable-incontrol))
+(def disable-incontrol-msg (midi-msg :disable-incontrol))
+
