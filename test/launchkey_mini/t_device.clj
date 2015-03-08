@@ -30,7 +30,7 @@
   (#'device/disable-incontrol-msg :type) => :note-on)
 
 (fact "returns correct led-details"
-  (#'device/led-details [0 0]) => {:note 0x60 :type :note-on}
-  (#'device/led-details :row1) => {:note 104 :type :note-on}
+  ((#'device/led-details [0 0]) :note) => 0x60
+  ((#'device/led-details :row1) :note) => 104
   (#'device/led-details :foo) => nil)
 
