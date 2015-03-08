@@ -1,6 +1,7 @@
 (ns launchkey-mini.device
   (:require
-    [launchkey-mini.midi :as midi]))
+    [launchkey-mini.midi :as midi]
+    [launchkey-mini.grid :as grid]))
 
 (def launchkey-mini-config {
   :name "LK Mini InControl"
@@ -49,3 +50,7 @@
 (def enable-incontrol-msg (midi-msg :enable-incontrol))
 (def disable-incontrol-msg (midi-msg :disable-incontrol))
 
+(defn led-details [id]
+  (if (vector? id)
+    {:note (apply grid/coordinate->note id) :type (-> launchkey-mini-config :interfaces :leds :grid :type)}
+    (-> launchkey-mini-config :interfaces :leds :controls id)))
