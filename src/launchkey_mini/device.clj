@@ -49,6 +49,7 @@
 (def knobs (-> launchkey-mini-config :interfaces :grid-controls :knobs keys))
 (def meta-keys (-> launchkey-mini-config :interfaces :grid-controls :meta-keys keys))
 (defn side->row [name] (-> launchkey-mini-config :interfaces :grid-controls :side-controls name :row))
+(defn row->side [row] (if (= row 0) :row1 :row2))
 
 (defn- midi-msg [name] (-> launchkey-mini-config :interfaces :midi-messages name))
 (def enable-incontrol-msg (midi-msg :enable-incontrol))
@@ -118,3 +119,64 @@
 (defn led-on-all [launchkeymini]
   (let [sink (-> launchkeymini :rcv)]
     (led-on-all* sink)))
+
+(defn render-row*
+  ([sink row-data row] (render-row* sink row-data row led/full-brightness :amber))
+  ([sink row-data row brightness color]
+    (doseq [column (range 0 grid/grid-width)]
+      (let [value (nth row-data column)]
+        (if (= value 0)
+          (led-off* sink [row column])
+          (led-on* sink [row column] brightness color))))))
+
+(defn render-row
+  ([launchkeymini row-data row] (render-row launchkeymini row-data row led/full-brightness :amber))
+  ([launchkeymini row-data row brightness color]
+    (let [sink (-> launchkeymini :rcv)]
+      (render-row* sink row-data row brightness color))))
+
+(defn render-side*
+  ([sink side-data row] (render-side* sink side-data row led/full-brightness :amber))
+  ([sink side-data row brightness color]
+    (doseq [row (range 0 grid/grid-height)]
+      (let [value (nth side-data row)]
+        (if (= value 0)
+          (led-off* sink (row->side row))
+          (led-on* sink (row->side row) brightness color))))))
+
+(defn render-side
+  ([launchkeymini side-data row] (render-side launchkeymini side-data row led/full-brightness :amber))
+  ([launchkeymini side-data row brightness color]
+    (let [sink (-> launchkeymini :rcv)]
+      (render-side* sink side-data row brightness color))))
+
+(defn- id->color [id]
+  (nth [:orange :red :green] (mod id 3)))
+
+(defn intromation [sink]
+  (reset-launchkey* sink)
+  (doall
+    (pmap
+      (fn [col]
+        (let [refresh (+ 50 (rand-int 50))
+              start-lag (rand-int 1000)]
+
+          (Thread/sleep start-lag)
+          (doseq [color led/led-colors]
+            (doseq [brightness (range led/low-brightness (+ led/full-brightness 1))]
+              (doseq [row (range 0 grid/grid-height)]
+                (led-on* sink [row col] brightness color)
+                (Thread/sleep (- refresh row)))))))
+      (range 0 grid/grid-width)))
+  (led-on-all* sink)
+  (Thread/sleep 400)
+  (doseq [col (reverse (range 0 grid/grid-width))]
+    (doseq [row (reverse (range 0 grid/grid-height))]
+      (led-on* sink [row col] led/full-brightness (id->color (+ col (* row grid/grid-width))))
+      (Thread/sleep 70)))
+  (Thread/sleep 400)
+  (doseq [row (reverse (range 0 grid/grid-height))]
+    (doseq [col (reverse (range 0 grid/grid-width))]
+      (led-off* sink [row col])
+      (Thread/sleep 50)))
+  (reset-launchkey* sink))
