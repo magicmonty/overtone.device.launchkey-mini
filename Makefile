@@ -6,5 +6,5 @@ ci:
 	sudo apt-get install supercollider
 
 travis:
-	lein2 midje launchkey-mini.t-led
+	lein2 midje
 
