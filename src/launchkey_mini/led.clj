@@ -3,6 +3,17 @@
    [overtone.studio.midi :refer :all]
    [overtone.libs.event :refer :all]))
 
+(defprotocol LED
+  (led-on [this id]
+          [this id color]
+          [this id color brightness])
+  (led-flash-on [this id]
+                [this id color]
+                [this id color brightness])
+  (led-off [this id])
+  (led-on-all [this])
+  (led-off-all [this]))
+
 (def off               0)
 (def low-brightness    1)
 (def medium-brightness 2)
@@ -14,7 +25,7 @@
             :clear 8
             :copy 12})
 
-(defn velocity [{color :color intensity :intensity mode :mode}]
+(defn- velocity [{color :color intensity :intensity mode :mode}]
   (if (some #{color} led-colors)
     (let [intensity (if (> intensity 3) 3 intensity)
           green (case color
