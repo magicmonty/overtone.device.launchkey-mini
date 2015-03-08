@@ -25,7 +25,7 @@
             :clear 8
             :copy 12})
 
-(defn- velocity [{color :color intensity :intensity mode :mode}]
+(defn velocity [{color :color intensity :intensity mode :mode}]
   (if (some #{color} led-colors)
     (let [intensity (if (> intensity 3) 3 intensity)
           green (case color
