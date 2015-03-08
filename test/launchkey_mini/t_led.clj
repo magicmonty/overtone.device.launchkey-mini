@@ -1,4 +1,4 @@
-(ns launchkey-mini.led-test
+(ns launchkey-mini.t-led
   (:require [midje.sweet :refer :all]
             [launchkey-mini.led :as led]))
 

@@ -11,6 +11,6 @@
                  [slingshot "0.10.3"]]
 
   :profiles {
-    :dev {:dependencies [[midje "1.5.1"]]
-          :plugins      [[lein-midje "3.0.1"]
+    :dev {:dependencies [[midje "1.6.3"]]
+          :plugins      [[lein-midje "3.1.3"]
                          [lein-kibit "0.0.8"]]}})
