@@ -6,13 +6,3 @@ A Clojure library designed to use the Novation Launchkey Mini with [Overtone](ht
 
 This code is mainly based on the work of @josephwilk at https://github.com/josephwilk/overtone.device.launchpad
 
-## Usage
-
-FIXME
-
-## License
-
-Copyright © 2015 by Martin Gondermann
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
