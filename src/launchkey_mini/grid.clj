@@ -110,6 +110,7 @@
                                   rest))))))
 
 (defn on?
+  "Checks, if a cell is on or off"
   ([grid row column] (on? [0 0] grid row column))
   ([page-coordinates grid row column] (not= 0 (cell page-coordinates grid row column))))
 
