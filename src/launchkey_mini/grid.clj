@@ -1,4 +1,5 @@
-(ns launchkey-mini.grid)
+(ns launchkey-mini.grid
+  (:use [slingshot.slingshot :only [throw+]]))
 
 (defn fn-grid [] {})
 
@@ -155,3 +156,9 @@
   "adds a new page on the bottom of the grid"
   (let [x (x-page-count  grid)]
     (concat grid (repeat grid-height (empty-row (* x grid-width))))))
+
+(defn write-complete-grid-row [grid y row]
+  (when-not (= (count row) (x-max grid))
+    (throw+ {:type ::DifferingRowSize :hint (str "row must match grid row size. The grid has rows: " (x-max grid) " passed row has: " (count row))}))
+  (assoc (vec grid) (mod y (y-max grid)) (map int row)))
+
