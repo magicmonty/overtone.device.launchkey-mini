@@ -142,3 +142,7 @@
     (if (< grid-column (x-max grid))
       (map #(nth % grid-column) (take grid-height (drop (y-offset 0 y-page) grid)))
       (take grid-height (repeat 0)))))
+
+(defn complete-row [grid row]
+  "Direct access into the entire grid, ignores any grid position"
+  (nth grid (mod row (count grid))))

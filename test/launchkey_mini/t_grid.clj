@@ -215,3 +215,15 @@
   (#'grid/absolute-column [0 1] multi-page-grid 16) => [0 3]
   (#'grid/absolute-column [1 0] multi-page-grid 16) => [0 1]
   (#'grid/absolute-column [1 1] multi-page-grid 16) => [0 3])
+
+(fact "complete-row gets complete row"
+  (#'grid/complete-row multi-page-grid 0) => [0 1 0 0 0 0 0 5 0 2 0 0 0 0 0 6]
+  (#'grid/complete-row multi-page-grid 1) => [1 0 0 0 0 0 0 5 2 0 0 0 0 0 0 6]
+  (#'grid/complete-row multi-page-grid 2) => [0 3 0 0 0 0 0 7 0 4 0 0 0 0 0 8]
+  (#'grid/complete-row multi-page-grid 3) => [3 0 0 0 0 0 0 7 4 0 0 0 0 0 0 8])
+
+(fact "complete-row wraps around"
+  (#'grid/complete-row multi-page-grid 4) => [0 1 0 0 0 0 0 5 0 2 0 0 0 0 0 6]
+  (#'grid/complete-row multi-page-grid 5) => [1 0 0 0 0 0 0 5 2 0 0 0 0 0 0 6]
+  (#'grid/complete-row multi-page-grid 6) => [0 3 0 0 0 0 0 7 0 4 0 0 0 0 0 8]
+  (#'grid/complete-row multi-page-grid 7) => [3 0 0 0 0 0 0 7 4 0 0 0 0 0 0 8])
