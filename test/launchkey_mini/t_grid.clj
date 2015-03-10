@@ -227,3 +227,22 @@
   (#'grid/complete-row multi-page-grid 5) => [1 0 0 0 0 0 0 5 2 0 0 0 0 0 0 6]
   (#'grid/complete-row multi-page-grid 6) => [0 3 0 0 0 0 0 7 0 4 0 0 0 0 0 8]
   (#'grid/complete-row multi-page-grid 7) => [3 0 0 0 0 0 0 7 4 0 0 0 0 0 0 8])
+
+(def multi-page-grid [[1 0 0 0 0 0 0 1]
+                      [1 0 0 0 0 0 0 1]
+                      [2 0 0 0 0 0 0 2]
+                      [2 0 0 0 0 0 0 2]])
+
+(fact "add-page-left adds page to all rows"
+  (#'grid/add-page-left multi-page-grid) => [[1 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0]
+                                             [1 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0]
+                                             [2 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0]
+                                             [2 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0]])
+
+(fact "add-page-bottom adds two new rows"
+  (#'grid/add-page-bottom multi-page-grid) => [[1 0 0 0 0 0 0 1]
+                                               [1 0 0 0 0 0 0 1]
+                                               [2 0 0 0 0 0 0 2]
+                                               [2 0 0 0 0 0 0 2]
+                                               [0 0 0 0 0 0 0 0]
+                                               [0 0 0 0 0 0 0 0]])

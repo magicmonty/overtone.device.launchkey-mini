@@ -146,3 +146,12 @@
 (defn complete-row [grid row]
   "Direct access into the entire grid, ignores any grid position"
   (nth grid (mod row (count grid))))
+
+(defn add-page-left [grid]
+  "adds a new page on the left side of the grid"
+  (map #(concat % (take grid-width (repeat 0))) grid))
+
+(defn add-page-bottom [grid]
+  "adds a new page on the bottom of the grid"
+  (let [x (x-page-count  grid)]
+    (concat grid (repeat grid-height (empty-row (* x grid-width))))))
