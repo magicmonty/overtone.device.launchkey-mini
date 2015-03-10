@@ -158,6 +158,8 @@
   (#'grid/get-row [1 1] multi-page-grid 1) => [4 0 4 0 4 0 4 0])
 
 (fact "get-row wraps around"
+  (#'grid/get-row multi-page-grid 2) => [0 1 0 1 0 1 0 1]
+  (#'grid/get-row multi-page-grid 3) => [1 0 1 0 1 0 1 0]
   (#'grid/get-row [0 0] multi-page-grid 2) => [0 1 0 1 0 1 0 1]
   (#'grid/get-row [0 0] multi-page-grid 3) => [1 0 1 0 1 0 1 0]
   (#'grid/get-row [1 0] multi-page-grid 2) => [0 2 0 2 0 2 0 2]
@@ -166,3 +168,34 @@
   (#'grid/get-row [0 1] multi-page-grid 3) => [3 0 3 0 3 0 3 0]
   (#'grid/get-row [1 1] multi-page-grid 2) => [0 4 0 4 0 4 0 4]
   (#'grid/get-row [1 1] multi-page-grid 3) => [4 0 4 0 4 0 4 0])
+
+(def multi-page-grid [[0 1 0 0 0 0 0 5 0 2 0 0 0 0 0 6]
+                      [1 0 0 0 0 0 0 5 2 0 0 0 0 0 0 6]
+                      [0 3 0 0 0 0 0 7 0 4 0 0 0 0 0 8]
+                      [3 0 0 0 0 0 0 7 4 0 0 0 0 0 0 8]])
+
+(fact "get-column returns a single column"
+  (#'grid/get-column multi-page-grid 0) => [0 1]
+  (#'grid/get-column multi-page-grid 1) => [1 0]
+  (#'grid/get-column multi-page-grid 7) => [5 5])
+
+(fact "get-column returns a single column in a multi-page-grid"
+  (#'grid/get-column [0 0] multi-page-grid 0) => [0 1]
+  (#'grid/get-column [0 0] multi-page-grid 1) => [1 0]
+  (#'grid/get-column [0 0] multi-page-grid 7) => [5 5]
+  (#'grid/get-column [1 0] multi-page-grid 0) => [0 2]
+  (#'grid/get-column [1 0] multi-page-grid 1) => [2 0]
+  (#'grid/get-column [1 0] multi-page-grid 7) => [6 6]
+  (#'grid/get-column [0 1] multi-page-grid 0) => [0 3]
+  (#'grid/get-column [0 1] multi-page-grid 1) => [3 0]
+  (#'grid/get-column [0 1] multi-page-grid 7) => [7 7]
+  (#'grid/get-column [1 1] multi-page-grid 0) => [0 4]
+  (#'grid/get-column [1 1] multi-page-grid 1) => [4 0]
+  (#'grid/get-column [1 1] multi-page-grid 7) => [8 8])
+
+(fact "get-column wraps around"
+  (#'grid/get-column multi-page-grid 8) => [0 1]
+  (#'grid/get-column [0 0] multi-page-grid 8) => [0 1]
+  (#'grid/get-column [1 0] multi-page-grid 8) => [0 2]
+  (#'grid/get-column [0 1] multi-page-grid 8) => [0 3]
+  (#'grid/get-column [1 1] multi-page-grid 8) => [0 4])

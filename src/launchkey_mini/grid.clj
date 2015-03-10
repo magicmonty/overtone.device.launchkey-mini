@@ -115,6 +115,7 @@
   ([page-coordinates grid row column] (not= 0 (cell page-coordinates grid row column))))
 
 (defn get-row
+  "Gets a row by its row number (0 or 1, wraps around) and page coordinates"
   ([grid row] (get-row [0 0] grid row))
   ([[x-page y-page] grid row]
     (let [y-offset (y-offset (mod row grid-height) y-page)]
@@ -122,3 +123,12 @@
         (nth grid y-offset)
         (drop (x-offset 0 x-page))
         (take (x-offset grid-width x-page))))))
+
+(defn get-column
+  "Gets a column by its column number (0 to 7, wraps around) and page coordinates"
+  ([grid column] (get-column [0 0] grid column))
+  ([[x-page y-page] grid column]
+    (let [x-offset (x-offset (mod column grid-width) x-page)]
+      (if (< x-offset (x-max grid))
+        (map #(nth % x-offset) (take grid-height (drop (y-offset 0 y-page) grid)))
+        (take grid-height (repeat 0))))))
