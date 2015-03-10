@@ -114,3 +114,11 @@
   ([grid row column] (on? [0 0] grid row column))
   ([page-coordinates grid row column] (not= 0 (cell page-coordinates grid row column))))
 
+(defn get-row
+  ([grid row] (get-row [0 0] grid row))
+  ([[x-page y-page] grid row]
+    (let [y-offset (y-offset (mod row grid-height) y-page)]
+      (->>
+        (nth grid y-offset)
+        (drop (x-offset 0 x-page))
+        (take (x-offset grid-width x-page))))))

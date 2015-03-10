@@ -35,10 +35,10 @@
 
 (fact "y-offset returns correct offset"
   (#'grid/y-offset 0 0) => 0
-  (#'grid/y-offset 0 1) => 2
-  (#'grid/y-offset 0 2) => 4
   (#'grid/y-offset 1 0) => 1
+  (#'grid/y-offset 0 1) => 2
   (#'grid/y-offset 1 1) => 3
+  (#'grid/y-offset 0 2) => 4
   (#'grid/y-offset 1 2) => 5)
 
 (fact "x-max returns grid total x size"
@@ -137,3 +137,32 @@
   (#'grid/on? [0 1] multi-page-grid 0 0) => true
   (#'grid/on? [1 0] multi-page-grid 0 1) => true
   (#'grid/on? [1 1] multi-page-grid 1 0) => false)
+
+(def multi-page-grid [[0 1 0 1 0 1 0 1 0 2 0 2 0 2 0 2]
+                      [1 0 1 0 1 0 1 0 2 0 2 0 2 0 2 0]
+                      [0 3 0 3 0 3 0 3 0 4 0 4 0 4 0 4]
+                      [3 0 3 0 3 0 3 0 4 0 4 0 4 0 4 0]])
+
+(fact "get-row returns a single row"
+  (#'grid/get-row multi-page-grid 0) => [0 1 0 1 0 1 0 1]
+  (#'grid/get-row multi-page-grid 1) => [1 0 1 0 1 0 1 0])
+
+(fact "get-row returns a single row in multi-page-grid"
+  (#'grid/get-row [0 0] multi-page-grid 0) => [0 1 0 1 0 1 0 1]
+  (#'grid/get-row [0 0] multi-page-grid 1) => [1 0 1 0 1 0 1 0]
+  (#'grid/get-row [1 0] multi-page-grid 0) => [0 2 0 2 0 2 0 2]
+  (#'grid/get-row [1 0] multi-page-grid 1) => [2 0 2 0 2 0 2 0]
+  (#'grid/get-row [0 1] multi-page-grid 0) => [0 3 0 3 0 3 0 3]
+  (#'grid/get-row [0 1] multi-page-grid 1) => [3 0 3 0 3 0 3 0]
+  (#'grid/get-row [1 1] multi-page-grid 0) => [0 4 0 4 0 4 0 4]
+  (#'grid/get-row [1 1] multi-page-grid 1) => [4 0 4 0 4 0 4 0])
+
+(fact "get-row wraps around"
+  (#'grid/get-row [0 0] multi-page-grid 2) => [0 1 0 1 0 1 0 1]
+  (#'grid/get-row [0 0] multi-page-grid 3) => [1 0 1 0 1 0 1 0]
+  (#'grid/get-row [1 0] multi-page-grid 2) => [0 2 0 2 0 2 0 2]
+  (#'grid/get-row [1 0] multi-page-grid 3) => [2 0 2 0 2 0 2 0]
+  (#'grid/get-row [0 1] multi-page-grid 2) => [0 3 0 3 0 3 0 3]
+  (#'grid/get-row [0 1] multi-page-grid 3) => [3 0 3 0 3 0 3 0]
+  (#'grid/get-row [1 1] multi-page-grid 2) => [0 4 0 4 0 4 0 4]
+  (#'grid/get-row [1 1] multi-page-grid 3) => [4 0 4 0 4 0 4 0])
