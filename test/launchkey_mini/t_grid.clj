@@ -117,3 +117,23 @@
                                               [0 0 0 0 0 0 0 0]]
   (#'grid/get-page [2 2] multi-page-grid) => [[0 0 0 0 0 0 0 0]
                                               [0 0 0 0 0 0 0 0]])
+
+(def multi-page-grid [[0 1 0 1 0 1 0 1 2 2 2 2 2 2 2 2]
+                      [1 0 1 0 1 0 1 0 2 2 2 2 2 2 2 2]
+                      [3 3 3 3 3 3 3 3 0 0 0 0 0 0 0 0]
+                      [3 3 3 3 3 3 3 3 0 0 0 0 0 0 0 0]])
+
+(fact "on? gets correct values for simple call"
+  (#'grid/on? multi-page-grid 0 0) => false
+  (#'grid/on? multi-page-grid 0 1) => true
+  (#'grid/on? multi-page-grid 1 0) => true
+  (#'grid/on? multi-page-grid 1 1) => false)
+
+(fact "on? gets correct values for multi-page-grid call"
+  (#'grid/on? [0 0] multi-page-grid 0 0) => false
+  (#'grid/on? [0 0] multi-page-grid 0 1) => true
+  (#'grid/on? [0 0] multi-page-grid 1 0) => true
+  (#'grid/on? [0 0] multi-page-grid 1 1) => false
+  (#'grid/on? [0 1] multi-page-grid 0 0) => true
+  (#'grid/on? [1 0] multi-page-grid 0 1) => true
+  (#'grid/on? [1 1] multi-page-grid 1 0) => false)
