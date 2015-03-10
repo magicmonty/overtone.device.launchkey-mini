@@ -132,3 +132,13 @@
       (if (< x-offset (x-max grid))
         (map #(nth % x-offset) (take grid-height (drop (y-offset 0 y-page) grid)))
         (take grid-height (repeat 0))))))
+
+(defn absolute-column
+  "Direct access into the grid irrelevant of x grid-index"
+  [[_ y-page] grid column]
+  (let [grid-column (cond
+                      (> column grid-width) (mod (int (dec (+ (/ column grid-width) column))) (+ 1 (x-max grid)))
+                      true                  column)]
+    (if (< grid-column (x-max grid))
+      (map #(nth % grid-column) (take grid-height (drop (y-offset 0 y-page) grid)))
+      (take grid-height (repeat 0)))))

@@ -199,3 +199,19 @@
   (#'grid/get-column [1 0] multi-page-grid 8) => [0 2]
   (#'grid/get-column [0 1] multi-page-grid 8) => [0 3]
   (#'grid/get-column [1 1] multi-page-grid 8) => [0 4])
+
+(fact "absolute-column returns a complete column"
+  (#'grid/absolute-column [0 0] multi-page-grid 0) => [0 1]
+  (#'grid/absolute-column [0 1] multi-page-grid 0) => [0 3]
+  (#'grid/absolute-column [0 0] multi-page-grid 7) => [5 5]
+  (#'grid/absolute-column [0 1] multi-page-grid 7) => [7 7]
+  (#'grid/absolute-column [0 0] multi-page-grid 9) => [2 0]
+  (#'grid/absolute-column [0 1] multi-page-grid 9) => [4 0]
+  (#'grid/absolute-column [0 0] multi-page-grid 15) => [6 6]
+  (#'grid/absolute-column [0 1] multi-page-grid 15) => [8 8])
+
+(fact "absolute-column wraps around"
+  (#'grid/absolute-column [0 0] multi-page-grid 16) => [0 1]
+  (#'grid/absolute-column [0 1] multi-page-grid 16) => [0 3]
+  (#'grid/absolute-column [1 0] multi-page-grid 16) => [0 1]
+  (#'grid/absolute-column [1 1] multi-page-grid 16) => [0 3])
