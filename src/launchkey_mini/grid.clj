@@ -14,29 +14,20 @@
 
 (defn- empty-row
   ([] (empty-row grid-width))
-  ([row-width] (vec (map (fn [_] 0) (range 0 row-width)))))
+  ([column-count] (vec (take column-count (repeat 0)))))
 
 (defn virtual-grid
   ([y-pages] (virtual-grid y-pages 1))
   ([y-pages x-pages]
-    (vec (map (fn [_] (empty-row (* grid-width x-pages))) (range 0 (* grid-height y-pages))))))
+    (let [overall-columns (* grid-width x-pages)
+          overall-rows (* grid-height y-pages)]
+      (vec (take overall-rows (repeat (empty-row overall-columns)))))))
 
 (defn empty-grid []
   (virtual-grid 1))
 
 (defn x-offset [x x-page] (+ x (* x-page grid-width)))
 (defn y-offset [y y-page] (+ y (* y-page grid-height)))
-
-(defn project
-  ([full-grid] (project [0 0] full-grid))
-  ([[x-pos y-pos] full-grid]
-     (map (fn [row]
-            (let [new-row (->> row
-                               (drop (x-offset 0 x-pos))
-                               (take grid-width)
-                               seq)]
-              (or new-row (take grid-width (repeat 0)))))
-          (take grid-height (drop (y-offset 0 y-pos) full-grid)))))
 
 (defn x-page-count [grid] (int (/ (count (first grid)) grid-width)))
 (defn y-page-count [grid] (int (/ (count grid) grid-height)))
@@ -77,3 +68,18 @@
   (if (and (< row (y-max grid)) (< column (x-max grid)))
     (-> grid (nth row) (nth column))
     0))
+
+(defn get-page
+  ([full-grid] (get-page [0 0] full-grid))
+  ([[y-page x-page] full-grid]
+     (map (fn [row]
+            (let [new-row (->> row
+                               (drop (x-offset 0 x-page))
+                               (take grid-width)
+                               seq)]
+              (or new-row (take grid-width (repeat 0)))))
+          (let [rest (drop (y-offset 0 y-page) full-grid)]
+            (take grid-height (if (empty? rest)
+                                  (repeat (empty-row (x-max full-grid)))
+                                  rest))))))
+

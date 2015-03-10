@@ -94,3 +94,26 @@
      [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
      [0 0 0 0 0 0 0 0 0 0 0 0xB 0 0 0 0]
      [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]] 2 11) => 0xB)
+
+(def multi-page-grid [[0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
+                      [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
+                      [2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3]
+                      [2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3]])
+
+(facts "Test get-page"
+  (#'grid/get-page multi-page-grid) => [[0 0 0 0 0 0 0 0]
+                                        [0 0 0 0 0 0 0 0]]
+  (#'grid/get-page [0 0] multi-page-grid) => [[0 0 0 0 0 0 0 0]
+                                              [0 0 0 0 0 0 0 0]]
+  (#'grid/get-page [0 1] multi-page-grid) => [[1 1 1 1 1 1 1 1]
+                                              [1 1 1 1 1 1 1 1]]
+  (#'grid/get-page [1 0] multi-page-grid) => [[2 2 2 2 2 2 2 2]
+                                              [2 2 2 2 2 2 2 2]]
+  (#'grid/get-page [1 1] multi-page-grid) => [[3 3 3 3 3 3 3 3]
+                                              [3 3 3 3 3 3 3 3]]
+  (#'grid/get-page [0 2] multi-page-grid) => [[0 0 0 0 0 0 0 0]
+                                              [0 0 0 0 0 0 0 0]]
+  (#'grid/get-page [2 0] multi-page-grid) => [[0 0 0 0 0 0 0 0]
+                                              [0 0 0 0 0 0 0 0]]
+  (#'grid/get-page [2 2] multi-page-grid) => [[0 0 0 0 0 0 0 0]
+                                              [0 0 0 0 0 0 0 0]])
