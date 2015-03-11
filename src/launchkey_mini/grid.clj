@@ -11,9 +11,9 @@
   [(range 0x60 (+ 0x60 grid-width))
   (range 0x70 (+ 0x70 grid-width))])
 
-(defn coordinate->note [row col]
-  "Converts a zero based coordinate (row, column) into a not for
-  controlling the LED of the note.
+(defn coordinate->note [col row]
+  "Converts a zero based coordinate (column, row) into a
+  midi note for controlling the LED of the grid pad.
   (wraps around at overflow)"
   (-> grid-notes (nth (mod row grid-height)) (nth (mod col grid-width))))
 
@@ -24,15 +24,16 @@
 
 (defn virtual-grid
   "creates a virtual grid of multiple pages in two dimensions"
-  ([y-pages] (virtual-grid y-pages 1))
-  ([y-pages x-pages]
+  ([] (virtual-grid 1))
+  ([y-pages] (virtual-grid 1 y-pages))
+  ([x-pages y-pages]
     (let [overall-columns (* grid-width x-pages)
           overall-rows (* grid-height y-pages)]
       (vec (take overall-rows (repeat (empty-row overall-columns)))))))
 
 (defn empty-grid []
   "creates the default empty grid"
-  (virtual-grid 1))
+  (virtual-grid))
 
 (defn x-offset
   "Calculates the x-offset of a pad within a full virtual grid"
@@ -60,8 +61,8 @@
 
 (defn toggle
   "Toggles a cell in a row on or off"
-  ([grid row column] (toggle [0 0] grid row column))
-  ([[y-page x-page] grid row column]
+  ([grid column row] (toggle [0 0] grid column row))
+  ([[x-page y-page] grid column row]
      (let [x-offset (x-offset column x-page)
            y-offset (y-offset row y-page)
            old-row (-> grid (nth y-offset) (vec))
@@ -72,8 +73,8 @@
 
 (defn set-cell
   "Set the content of a cell within a grid to a given value"
-  ([grid row column value] (set-cell [0 0] grid row column value))
-  ([[y-page x-page] grid row column value]
+  ([grid column row value] (set-cell [0 0] grid column row value))
+  ([[x-page y-page] grid column row value]
      (let [y-offset (y-offset row y-page)
            old-row (-> grid (nth y-offset) (vec))
            new-row (assoc old-row (x-offset column x-page) value)]
@@ -81,15 +82,15 @@
 
 (defn cell
   "Get the value of a cell"
-  ([grid row column] (cell [0 0] grid row column))
-  ([[y-page x-page] grid row column]
+  ([grid column row] (cell [0 0] grid column row))
+  ([[x-page y-page] grid column row]
      (let [x-offset (x-offset column x-page)
            y-offset (y-offset row y-page)]
        (-> grid
            (nth y-offset)
            (nth x-offset)))))
 
-(defn absolute-cell [grid row column]
+(defn absolute-cell [grid column row]
   "Get the value of a cell by its absolute coordinates"
   (if (and (< row (y-max grid)) (< column (x-max grid)))
     (-> grid (nth row) (nth column))
@@ -98,7 +99,7 @@
 (defn get-page
   "Gets the specified page"
   ([full-grid] (get-page [0 0] full-grid))
-  ([[y-page x-page] full-grid]
+  ([[x-page y-page] full-grid]
      (map (fn [row]
             (let [new-row (->> row
                                (drop (x-offset 0 x-page))
@@ -112,8 +113,8 @@
 
 (defn on?
   "Checks, if a cell is on or off"
-  ([grid row column] (on? [0 0] grid row column))
-  ([page-coordinates grid row column] (not= 0 (cell page-coordinates grid row column))))
+  ([grid column row] (on? [0 0] grid column row))
+  ([page-coordinates grid column row] (not= 0 (cell page-coordinates grid column row))))
 
 (defn get-row
   "Gets a row by its row number (0 or 1, wraps around) and page coordinates"
@@ -157,8 +158,8 @@
   (let [x (x-page-count  grid)]
     (concat grid (repeat grid-height (empty-row (* x grid-width))))))
 
-(defn write-complete-grid-row [grid y row]
-  (when-not (= (count row) (x-max grid))
-    (throw+ {:type ::DifferingRowSize :hint (str "row must match grid row size. The grid has rows: " (x-max grid) " passed row has: " (count row))}))
-  (assoc (vec grid) (mod y (y-max grid)) (map int row)))
+(defn write-complete-grid-row [grid y row-data]
+  (when-not (= (count row-data) (x-max grid))
+    (throw+ {:type ::DifferingRowSize :hint (str "row-data must match grid row size. The grid has rows: " (x-max grid) " passed row-data has: " (count row-data))}))
+  (assoc (vec grid) (mod y (y-max grid)) (map int row-data)))
 

@@ -46,15 +46,15 @@
   (provided
     (#'midi/midi-note-on ..sink.. 0x60 63) => true)
 
-  (#'device/led-on {:rcv ..sink..} [0 7]) => truthy
+  (#'device/led-on {:rcv ..sink..} [7 0]) => truthy
   (provided
     (#'midi/midi-note-on ..sink.. 0x67 63) => true)
 
-  (#'device/led-on {:rcv ..sink..} [1 0]) => truthy
+  (#'device/led-on {:rcv ..sink..} [0 1]) => truthy
   (provided
     (#'midi/midi-note-on ..sink.. 0x70 63) => true)
 
-  (#'device/led-on {:rcv ..sink..} [1 7]) => truthy
+  (#'device/led-on {:rcv ..sink..} [7 1]) => truthy
   (provided
     (#'midi/midi-note-on ..sink.. 0x77 63) => true))
 
@@ -90,13 +90,13 @@
   (#'device/render-row {:rcv ..sink..} [0 1 0 0 0 1 0 0] 0) => nil
   (provided
     (#'device/led-off* ..sink.. [0 0]) => true
-    (#'device/led-on*  ..sink.. [0 1] 3 :amber) => true
-    (#'device/led-off* ..sink.. [0 2]) => true
-    (#'device/led-off* ..sink.. [0 3]) => true
-    (#'device/led-off* ..sink.. [0 4]) => true
-    (#'device/led-on*  ..sink.. [0 5] 3 :amber) => true
-    (#'device/led-off* ..sink.. [0 6]) => true
-    (#'device/led-off* ..sink.. [0 7]) => true))
+    (#'device/led-on*  ..sink.. [1 0] 3 :amber) => true
+    (#'device/led-off* ..sink.. [2 0]) => true
+    (#'device/led-off* ..sink.. [3 0]) => true
+    (#'device/led-off* ..sink.. [4 0]) => true
+    (#'device/led-on*  ..sink.. [5 0] 3 :amber) => true
+    (#'device/led-off* ..sink.. [6 0]) => true
+    (#'device/led-off* ..sink.. [7 0]) => true))
 
 (fact "render-side calls the correct commands"
   (#'device/render-side {:rcv ..sink..} [0 1]) => nil

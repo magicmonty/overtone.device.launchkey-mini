@@ -4,24 +4,24 @@
 
 (fact "coordinate->note returns correct note"
   (#'grid/coordinate->note 0 0) => 0x60
-  (#'grid/coordinate->note 0 7) => 0x67
-  (#'grid/coordinate->note 1 0) => 0x70
-  (#'grid/coordinate->note 1 7) => 0x77)
+  (#'grid/coordinate->note 7 0) => 0x67
+  (#'grid/coordinate->note 0 1) => 0x70
+  (#'grid/coordinate->note 7 1) => 0x77)
 
 (fact "coordinate->note wraps at x-overflow"
-  (#'grid/coordinate->note 0 8) => 0x60
-  (#'grid/coordinate->note 1 8) => 0x70)
+  (#'grid/coordinate->note 8 0) => 0x60
+  (#'grid/coordinate->note 8 1) => 0x70)
 
 (fact "coordinate->note wraps at y-overflow"
-  (#'grid/coordinate->note 2 0) => 0x60)
+  (#'grid/coordinate->note 0 2) => 0x60)
 
 (fact "x-page-count returns correct count"
-  (#'grid/x-page-count (#'grid/virtual-grid 1 2)) => 2
+  (#'grid/x-page-count (#'grid/virtual-grid 2 1)) => 2
   (#'grid/x-page-count (#'grid/virtual-grid 2)) => 1
   (#'grid/x-page-count (#'grid/empty-grid)) => 1)
 
 (fact "y-page-count returns correct count"
-  (#'grid/y-page-count (#'grid/virtual-grid 1 2)) => 1
+  (#'grid/y-page-count (#'grid/virtual-grid 2 1)) => 1
   (#'grid/y-page-count (#'grid/virtual-grid 2)) => 2
   (#'grid/y-page-count (#'grid/empty-grid)) => 1)
 
@@ -43,57 +43,57 @@
 
 (fact "x-max returns grid total x size"
   (#'grid/x-max (#'grid/empty-grid)) => 8
-  (#'grid/x-max (#'grid/virtual-grid 1 2)) => 16)
+  (#'grid/x-max (#'grid/virtual-grid 2 1)) => 16)
 
 (fact "y-max returns grid total y size"
   (#'grid/y-max (#'grid/empty-grid)) => 2
-  (#'grid/y-max (#'grid/virtual-grid 2 1)) => 4)
+  (#'grid/y-max (#'grid/virtual-grid 1 2)) => 4)
 
 (fact "toggle toggles correct cell with default grid"
   (#'grid/toggle (#'grid/empty-grid) 0 0) => [[1 0 0 0 0 0 0 0]
                                               [0 0 0 0 0 0 0 0]]
-  (#'grid/toggle (#'grid/empty-grid) 1 5) => [[0 0 0 0 0 0 0 0]
+  (#'grid/toggle (#'grid/empty-grid) 5 1) => [[0 0 0 0 0 0 0 0]
                                               [0 0 0 0 0 1 0 0]])
 
 (fact "toggle toggles correct cell with extended grid"
-  (#'grid/toggle [1 0] (#'grid/virtual-grid 2 1) 0 0) => [[0 0 0 0 0 0 0 0]
+  (#'grid/toggle [0 1] (#'grid/virtual-grid 1 2) 0 0) => [[0 0 0 0 0 0 0 0]
                                                           [0 0 0 0 0 0 0 0]
                                                           [1 0 0 0 0 0 0 0]
                                                           [0 0 0 0 0 0 0 0]]
-  (#'grid/toggle [0 1] (#'grid/virtual-grid 1 2) 0 0) => [[0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0]
+  (#'grid/toggle [1 0] (#'grid/virtual-grid 2 1) 0 0) => [[0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0]
                                                           [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]])
 
 (fact "set-cell sets given value to correct cell with default grid"
   (#'grid/set-cell (#'grid/empty-grid) 0 0 5) => [[5 0 0 0 0 0 0 0]
                                                   [0 0 0 0 0 0 0 0]]
-  (#'grid/set-cell (#'grid/empty-grid) 1 5 4) => [[0 0 0 0 0 0 0 0]
+  (#'grid/set-cell (#'grid/empty-grid) 5 1 4) => [[0 0 0 0 0 0 0 0]
                                                   [0 0 0 0 0 4 0 0]])
 
 (fact "set-cell sets given value to correct cell with extended grid"
-  (#'grid/set-cell [1 0] (#'grid/virtual-grid 2 1) 0 0 5) => [[0 0 0 0 0 0 0 0]
+  (#'grid/set-cell [0 1] (#'grid/virtual-grid 1 2) 0 0 5) => [[0 0 0 0 0 0 0 0]
                                                               [0 0 0 0 0 0 0 0]
                                                               [5 0 0 0 0 0 0 0]
                                                               [0 0 0 0 0 0 0 0]]
-  (#'grid/set-cell [0 1] (#'grid/virtual-grid 1 2) 0 0 3) => [[0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0]
+  (#'grid/set-cell [1 0] (#'grid/virtual-grid 2 1) 0 0 3) => [[0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0]
                                                               [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]])
 
 (fact "cell returns the correct value for a default grid"
-  (#'grid/cell [[1 2 3 4 5 6 7 8][0 0 0 0 0 0 0 0]] 0 3) => 4
-  (#'grid/cell [[0 0 0 0 0 0 0 0][1 2 3 4 5 6 7 8]] 1 5) => 6)
+  (#'grid/cell [[1 2 3 4 5 6 7 8][0 0 0 0 0 0 0 0]] 3 0) => 4
+  (#'grid/cell [[0 0 0 0 0 0 0 0][1 2 3 4 5 6 7 8]] 5 1) => 6)
 
 (fact "cell returns the correct value for an extended grid"
   (#'grid/cell [1 1]
     [[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
      [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
      [0 0 0 0 0 0 0 0 0 0 0 0xB 0 0 0 0]
-     [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]] 0 3) => 0xB)
+     [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]] 3 0) => 0xB)
 
 (fact "absolute-cell returns the correct value for an extended grid"
   (#'grid/absolute-cell
     [[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
      [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
      [0 0 0 0 0 0 0 0 0 0 0 0xB 0 0 0 0]
-     [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]] 2 11) => 0xB)
+     [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]] 11 2) => 0xB)
 
 (def multi-page-grid [[0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
                       [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
@@ -105,15 +105,15 @@
                                         [0 0 0 0 0 0 0 0]]
   (#'grid/get-page [0 0] multi-page-grid) => [[0 0 0 0 0 0 0 0]
                                               [0 0 0 0 0 0 0 0]]
-  (#'grid/get-page [0 1] multi-page-grid) => [[1 1 1 1 1 1 1 1]
+  (#'grid/get-page [1 0] multi-page-grid) => [[1 1 1 1 1 1 1 1]
                                               [1 1 1 1 1 1 1 1]]
-  (#'grid/get-page [1 0] multi-page-grid) => [[2 2 2 2 2 2 2 2]
+  (#'grid/get-page [0 1] multi-page-grid) => [[2 2 2 2 2 2 2 2]
                                               [2 2 2 2 2 2 2 2]]
   (#'grid/get-page [1 1] multi-page-grid) => [[3 3 3 3 3 3 3 3]
                                               [3 3 3 3 3 3 3 3]]
-  (#'grid/get-page [0 2] multi-page-grid) => [[0 0 0 0 0 0 0 0]
-                                              [0 0 0 0 0 0 0 0]]
   (#'grid/get-page [2 0] multi-page-grid) => [[0 0 0 0 0 0 0 0]
+                                              [0 0 0 0 0 0 0 0]]
+  (#'grid/get-page [0 2] multi-page-grid) => [[0 0 0 0 0 0 0 0]
                                               [0 0 0 0 0 0 0 0]]
   (#'grid/get-page [2 2] multi-page-grid) => [[0 0 0 0 0 0 0 0]
                                               [0 0 0 0 0 0 0 0]])
@@ -125,18 +125,18 @@
 
 (fact "on? gets correct values for simple call"
   (#'grid/on? multi-page-grid 0 0) => false
-  (#'grid/on? multi-page-grid 0 1) => true
   (#'grid/on? multi-page-grid 1 0) => true
+  (#'grid/on? multi-page-grid 0 1) => true
   (#'grid/on? multi-page-grid 1 1) => false)
 
 (fact "on? gets correct values for multi-page-grid call"
   (#'grid/on? [0 0] multi-page-grid 0 0) => false
-  (#'grid/on? [0 0] multi-page-grid 0 1) => true
   (#'grid/on? [0 0] multi-page-grid 1 0) => true
+  (#'grid/on? [0 0] multi-page-grid 0 1) => true
   (#'grid/on? [0 0] multi-page-grid 1 1) => false
-  (#'grid/on? [0 1] multi-page-grid 0 0) => true
-  (#'grid/on? [1 0] multi-page-grid 0 1) => true
-  (#'grid/on? [1 1] multi-page-grid 1 0) => false)
+  (#'grid/on? [0 1] multi-page-grid 1 0) => true
+  (#'grid/on? [1 0] multi-page-grid 0 0) => true
+  (#'grid/on? [1 1] multi-page-grid 0 1) => false)
 
 (def multi-page-grid [[0 1 0 1 0 1 0 1 0 2 0 2 0 2 0 2]
                       [1 0 1 0 1 0 1 0 2 0 2 0 2 0 2 0]
@@ -196,8 +196,8 @@
 (fact "get-column wraps around"
   (#'grid/get-column multi-page-grid 8) => [0 1]
   (#'grid/get-column [0 0] multi-page-grid 8) => [0 1]
-  (#'grid/get-column [1 0] multi-page-grid 8) => [0 2]
   (#'grid/get-column [0 1] multi-page-grid 8) => [0 3]
+  (#'grid/get-column [1 0] multi-page-grid 8) => [0 2]
   (#'grid/get-column [1 1] multi-page-grid 8) => [0 4])
 
 (fact "absolute-column returns a complete column"

@@ -138,8 +138,8 @@
     (doseq [column (range 0 grid/grid-width)]
       (let [value (nth row-data column)]
         (if (= value 0)
-          (led-off* sink [row column])
-          (led-on* sink [row column] brightness color))))))
+          (led-off* sink [column row])
+          (led-on* sink [column row] brightness color))))))
 
 (defn render-row
   "Renders a complete row. You have to provide the row-data
