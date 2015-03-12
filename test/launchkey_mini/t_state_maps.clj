@@ -128,3 +128,85 @@
                               :fn-map {:default-1x0 {:row1 ..handler..}}
                               :page-coords [1 0]})
                         :row1) => ..handler..)
+
+(def multigrid [[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1]
+                [0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0]
+                [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+                [0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0]])
+
+(fact "on? returns correct value for given state"
+      (#'sm/on? (atom {:active :default
+                       :modes {:default {:grid multigrid}}
+                       :page-coords [0 0]})
+                7 1) => truthy
+      (#'sm/on? (atom {:active :default
+                       :modes {:default {:grid multigrid}}
+                       :page-coords [1 0]})
+                7 0) => truthy
+      (#'sm/on? (atom {:active :default
+                       :modes {:default {:grid multigrid}}
+                       :page-coords [0 1]})
+                0 0) => truthy
+      (#'sm/on? (atom {:active :default
+                       :modes {:default {:grid multigrid}}
+                       :page-coords [1 1]})
+                0 1) => truthy)
+
+(fact "visible? returns correct value for given absolute cell coordinates in state"
+      (#'sm/visible? (atom {:active :default
+                            :modes {:default {:grid multigrid}}
+                            :page-coords [0 0]})
+                     0 0) => truthy
+
+      (#'sm/visible? (atom {:active :default
+                            :modes {:default {:grid multigrid}}
+                            :page-coords [0 0]})
+                     7 0) => truthy
+
+      (#'sm/visible? (atom {:active :default
+                            :modes {:default {:grid multigrid}}
+                            :page-coords [0 0]})
+                     8 0) => falsey
+
+      (#'sm/visible? (atom {:active :default
+                            :modes {:default {:grid multigrid}}
+                            :page-coords [1 0]})
+                     8 0) => truthy)
+
+(fact "set-cell! sets the given value in the grid"
+      @(#'sm/set-cell! (atom {:active :default
+                              :modes {:default {:grid multigrid}}
+                              :page-coords [0 0]})
+                        3 1 5) => {:active :default
+                                   :modes {:default {:grid [[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1]
+                                                            [0 0 0 5 0 0 0 1 0 0 0 0 0 0 0 0]
+                                                            [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+                                                            [0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0]]}}
+                              :page-coords [0 0]}
+      @(#'sm/set-cell! (atom {:active :default
+                              :modes {:default {:grid multigrid}}
+                              :page-coords [1 0]})
+                        4 1 8) => {:active :default
+                                   :modes {:default {:grid [[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1]
+                                                            [0 0 0 0 0 0 0 1 0 0 0 0 8 0 0 0]
+                                                            [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+                                                            [0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0]]}}
+                              :page-coords [1 0]}
+      @(#'sm/set-cell! (atom {:active :default
+                              :modes {:default {:grid multigrid}}
+                              :page-coords [0 1]})
+                        7 0 2) => {:active :default
+                                   :modes {:default {:grid [[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1]
+                                                            [0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0]
+                                                            [1 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0]
+                                                            [0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0]]}}
+                              :page-coords [0 1]}
+      @(#'sm/set-cell! (atom {:active :default
+                              :modes {:default {:grid multigrid}}
+                              :page-coords [1 1]})
+                        3 1 5) => {:active :default
+                                   :modes {:default {:grid [[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1]
+                                                            [0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0]
+                                                            [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+                                                            [0 0 0 0 0 0 0 0 1 0 0 5 0 0 0 0]]}}
+                              :page-coords [1 1]})

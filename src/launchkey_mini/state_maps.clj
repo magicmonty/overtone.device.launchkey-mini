@@ -39,6 +39,22 @@
 (defn active-grid [state] ((active-mode state) :grid))
 (defn active-page [state] (grid/get-page (page-coords state) (active-grid state)))
 
+(defn on?
+  ([state column row] (on? state column row (page-coords state)))
+  ([state column row page-coords] (grid/on? page-coords (active-grid state) column row)))
+
+(defn visible? [state column row]
+  (let [[x-page y-page] (page-coords state)]
+    (and (= x-page (int (/ column grid/grid-width)))
+         (= y-page (int (/ row grid/grid-height))))))
+
+
+(defn- active-handle-key [state] (keyword (subs (str (mode state) "-" (page-id state)) 1)))
+(defn trigger-fn
+  ([state column row] (trigger-fn state (str column "x" row)))
+  ([state id]
+    (get-in (:fn-map @state) [(active-handle-key state) (keyword id)])))
+
 (defn toggle! [state column row]
   (let [new-grid (grid/toggle (page-coords state) (active-grid state) column row)]
     (swap! state assoc-in [:modes (mode state) :grid] new-grid)
@@ -49,13 +65,7 @@
     (swap! state assoc-in [:modes (mode state) :side] new-side)
     state))
 
-(defn on?
-  ([state column row] (on? state column row (page-coords state)))
-  ([state column row page-coords] (grid/on? page-coords (active-grid state) column row)))
+(defn set-cell! [state column row value]
+  (swap! state assoc-in [:modes (mode state) :grid] (grid/set-cell (page-coords state) (active-grid state) column row value))
+  state)
 
-
-(defn- active-handle-key [state] (keyword (subs (str (mode state) "-" (page-id state)) 1)))
-(defn trigger-fn
-  ([state column row] (trigger-fn state (str column "x" row)))
-  ([state id]
-    (get-in (:fn-map @state) [(active-handle-key state) (keyword id)])))
