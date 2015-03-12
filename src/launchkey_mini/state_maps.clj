@@ -25,7 +25,9 @@
 (defn active-mode? [state candidate-mode] (= candidate-mode (mode state)))
 (defn active-mode  [state] (-> ((mode state) (:modes @state))))
 (defn page-coords  [state] (:page-coords @state))
-(defn- page-id      [state] (str (first (page-coords state)) "x" (second (page-coords state))))
+(defn- grid-y-page [state] (second (page-coords state)))
+(defn- grid-x-page [state] (first (page-coords state)))
+(defn- page-id     [state] (str (grid-x-page state) "x" (grid-y-page state)))
 
 (defn add-mode [state mode-id]
   "Adds a new mode to the state"
@@ -40,6 +42,11 @@
 (defn toggle! [state column row]
   (let [new-grid (grid/toggle (page-coords state) (active-grid state) column row)]
     (swap! state assoc-in [:modes (mode state) :grid] new-grid)
+    state))
+
+(defn toggle-side! [state row]
+  (let [new-side (side/toggle (active-side state) row (grid-y-page state))]
+    (swap! state assoc-in [:modes (mode state) :side] new-side)
     state))
 
 (defn- active-handle-key [state] (keyword (subs (str (mode state) "-" (page-id state)) 1)))

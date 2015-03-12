@@ -14,36 +14,36 @@
 
 (defn cell
   "Gets the state of a row on the side"
-  [side row virtual-row]
-  (get-in side [virtual-row row] 0))
+  [side row page]
+  (get-in side [page row] 0))
 
 (defn absolute-cell
-  "Gets the state of the absolute side cell by specifying the virtual row"
-  [side virtual-row]
-  (cell side (mod virtual-row side-btn-height) (int (/ virtual-row side-btn-height))))
+  "Gets the state of the absolute side cell by specifying the page"
+  [side page]
+  (cell side (mod page side-btn-height) (int (/ page side-btn-height))))
 
 (defn on?
   "checks, if the specified side cell is on"
-  [side row virtual-row]
-  (not= 0 (cell side row virtual-row)))
+  [side row page]
+  (not= 0 (cell side row page)))
 
 (defn absolute-on?
-  "checks, if the specified side cell is on (specified by the virtual row)"
-  [side virtual-row]
-  (not= 0 (absolute-cell side virtual-row)))
+  "checks, if the specified side cell is on (specified by the page)"
+  [side page]
+  (not= 0 (absolute-cell side page)))
 
 (defn toggle
   "Toggles the state of the given cell"
-  [side row virtual-row]
-  (let [new-cell (if (on? side row virtual-row) 0 1)]
-    (assoc-in side [virtual-row row] new-cell)))
+  [side row page]
+  (let [new-cell (if (on? side row page) 0 1)]
+    (assoc-in side [page row] new-cell)))
 
 (defn shift-down
   "Adds a new pair of"
  [side]
   (conj side (empty-rows)))
 
-(defn project
-  "Gets the projection of the rows"
-  [side virtual-row]
-  (nth side virtual-row))
+(defn get-page
+  "Gets the specified page"
+  [side page]
+  (nth side page))

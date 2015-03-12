@@ -103,9 +103,28 @@
                                                       [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1]]}}
                              :page-coords [1 1]})
 
+(fact "toggle-side! toggles correct led"
+      @(#'sm/toggle-side! (atom {:active :default
+                                 :modes {:default {:side [[0 0] [0 0]]}}
+                                 :page-coords [0 0]})
+                          0) => {:active :default
+                                 :modes {:default {:side [[1 0] [0 0]]}}
+                                 :page-coords [0 0]}
+
+      @(#'sm/toggle-side! (atom {:active :default
+                                 :modes {:default {:side [[0 0] [0 0]]}}
+                                 :page-coords [1 1]})
+                          1) => {:active :default
+                                 :modes {:default {:side [[0 0] [0 1]]}}
+                                 :page-coords [1 1]})
 
 (fact "trigger-fn returns correct function"
       (#'sm/trigger-fn (atom {:active :default
                               :fn-map {:default-0x1 {:3x1 ..handler..}}
                               :page-coords [0 1]})
-                        3 1) => ..handler..)
+                        3 1) => ..handler..
+
+      (#'sm/trigger-fn (atom {:active :default
+                              :fn-map {:default-1x0 {:row1 ..handler..}}
+                              :page-coords [1 0]})
+                        :row1) => ..handler..)
