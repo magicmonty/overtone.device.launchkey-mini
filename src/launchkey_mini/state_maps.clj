@@ -49,6 +49,11 @@
     (swap! state assoc-in [:modes (mode state) :side] new-side)
     state))
 
+(defn on?
+  ([state column row] (on? state column row (page-coords state)))
+  ([state column row page-coords] (grid/on? page-coords (active-grid state) column row)))
+
+
 (defn- active-handle-key [state] (keyword (subs (str (mode state) "-" (page-id state)) 1)))
 (defn trigger-fn
   ([state column row] (trigger-fn state (str column "x" row)))
