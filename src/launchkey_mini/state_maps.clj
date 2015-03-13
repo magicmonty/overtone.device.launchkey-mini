@@ -69,3 +69,7 @@
   (swap! state assoc-in [:modes (mode state) :grid] (grid/set-cell (page-coords state) (active-grid state) column row value))
   state)
 
+(defn cell
+  "Cell relative to the active grid"
+  [state column row] (grid/cell (page-coords state) (active-grid state) column row))
+

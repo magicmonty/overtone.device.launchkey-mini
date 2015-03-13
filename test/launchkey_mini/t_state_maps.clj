@@ -210,3 +210,26 @@
                                                             [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
                                                             [0 0 0 0 0 0 0 0 1 0 0 5 0 0 0 0]]}}
                               :page-coords [1 1]})
+
+
+(fact "cell gets cell from current state"
+      (#'sm/cell (atom {:active :default
+                        :modes {:default {:grid multigrid}}
+                        :page-coords [0 0]})
+                 0 0) => 0
+      (#'sm/cell (atom {:active :default
+                        :modes {:default {:grid multigrid}}
+                        :page-coords [0 0]})
+                 7 0) => 0
+      (#'sm/cell (atom {:active :default
+                        :modes {:default {:grid multigrid}}
+                        :page-coords [0 0]})
+                 0 1) => 0
+      (#'sm/cell (atom {:active :default
+                        :modes {:default {:grid multigrid}}
+                        :page-coords [0 0]})
+                 7 1) => 1
+      (#'sm/cell (atom {:active :default
+                        :modes {:default {:grid multigrid}}
+                        :page-coords [0 1]})
+                 0 0) => 1)
