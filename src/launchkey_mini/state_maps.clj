@@ -69,7 +69,18 @@
   (swap! state assoc-in [:modes (mode state) :grid] (grid/set-cell (page-coords state) (active-grid state) column row value))
   state)
 
-(defn cell
+(defn cell [state column row]
   "Cell relative to the active grid"
-  [state column row] (grid/cell (page-coords state) (active-grid state) column row))
+  (grid/cell (page-coords state) (active-grid state) column row))
+
+(defn absolute-cell [state column row]
+  "Cell absolute to the active grid"
+  (grid/absolute-cell (active-grid state) column row))
+
+(defn side-cell [state column]
+  (side/cell (active-side state) column (grid-y-page state)))
+
+(defn get-row    [state rowIndex] (grid/get-row (page-coords state) (active-grid state) rowIndex))
+(defn get-column [state colIndex] (grid/get-column (page-coords state) (active-grid state) colIndex))
+(defn absolute-column [state colIndex] (grid/absolute-column (page-coords state) (active-grid state) colIndex))
 

@@ -233,3 +233,113 @@
                         :modes {:default {:grid multigrid}}
                         :page-coords [0 1]})
                  0 0) => 1)
+
+(fact "absolute-cell gets cell value via its absolute position"
+      (#'sm/absolute-cell (atom {:active :default
+                                 :modes {:default {:grid multigrid}}})
+                          0 0) => 0
+      (#'sm/absolute-cell (atom {:active :default
+                                 :modes {:default {:grid multigrid}}})
+                          15 0) => 1
+      (#'sm/absolute-cell (atom {:active :default
+                                 :modes {:default {:grid multigrid}}})
+                          7 1) => 1
+      (#'sm/absolute-cell (atom {:active :default
+                                 :modes {:default {:grid multigrid}}})
+                          0 2) => 1
+      (#'sm/absolute-cell (atom {:active :default
+                                 :modes {:default {:grid multigrid}}})
+                          8 3) => 1)
+
+(fact "side-cell gets correct value"
+      (#'sm/side-cell (atom {:active :default
+                                 :modes {:default {:side [[0 1][2 3]]}}
+                                 :page-coords [0 0]})
+                       0) => 0
+      (#'sm/side-cell (atom {:active :default
+                                 :modes {:default {:side [[0 1][2 3]]}}
+                                 :page-coords [0 0]})
+                       1) => 1
+      (#'sm/side-cell (atom {:active :default
+                                 :modes {:default {:side [[0 1][2 3]]}}
+                                 :page-coords [0 1]})
+                       0) => 2
+      (#'sm/side-cell (atom {:active :default
+                                 :modes {:default {:side [[0 1][2 3]]}}
+                                 :page-coords [0 1]})
+                       1) => 3)
+
+(fact "get-row returns correct row data"
+      (#'sm/get-row (atom {:active :default
+                           :modes {:default {:grid multigrid}}
+                           :page-coords [0 0]})
+                     0) => [0 0 0 0 0 0 0 0]
+      (#'sm/get-row (atom {:active :default
+                           :modes {:default {:grid multigrid}}
+                           :page-coords [0 0]})
+                     1) => [0 0 0 0 0 0 0 1]
+
+      (#'sm/get-row (atom {:active :default
+                           :modes {:default {:grid multigrid}}
+                           :page-coords [1 0]})
+                     0) => [0 0 0 0 0 0 0 1]
+      (#'sm/get-row (atom {:active :default
+                           :modes {:default {:grid multigrid}}
+                           :page-coords [1 0]})
+                     1) => [0 0 0 0 0 0 0 0]
+
+      (#'sm/get-row (atom {:active :default
+                           :modes {:default {:grid multigrid}}
+                           :page-coords [0 1]})
+                     0) => [1 0 0 0 0 0 0 0]
+      (#'sm/get-row (atom {:active :default
+                           :modes {:default {:grid multigrid}}
+                           :page-coords [0 1]})
+                     1) => [0 0 0 0 0 0 0 0]
+
+      (#'sm/get-row (atom {:active :default
+                           :modes {:default {:grid multigrid}}
+                           :page-coords [1 1]})
+                     0) => [0 0 0 0 0 0 0 0]
+      (#'sm/get-row (atom {:active :default
+                           :modes {:default {:grid multigrid}}
+                           :page-coords [1 1]})
+                     1) => [1 0 0 0 0 0 0 0])
+
+(fact "get-column returns correct column-data"
+      (#'sm/get-column (atom {:active :default
+                             :modes {:default {:grid multigrid}}
+                             :page-coords [0 0]})
+                     7) => [0 1]
+      (#'sm/get-column (atom {:active :default
+                             :modes {:default {:grid multigrid}}
+                             :page-coords [1 0]})
+                     7) => [1 0]
+      (#'sm/get-column (atom {:active :default
+                             :modes {:default {:grid multigrid}}
+                             :page-coords [0 1]})
+                     0) => [1 0]
+      (#'sm/get-column (atom {:active :default
+                             :modes {:default {:grid multigrid}}
+                             :page-coords [1 1]})
+                     0) => [0 1])
+
+(fact "absolute-column returns complete column"
+      (#'sm/absolute-column (atom {:active :default
+                                   :modes {:default {:grid multigrid}}
+                                   :page-coords [0 0]})
+                             7) => [0 1]
+      (#'sm/absolute-column (atom {:active :default
+                                   :modes {:default {:grid multigrid}}
+                                   :page-coords [0 0]})
+                            15) => [1 0]
+
+      (#'sm/absolute-column (atom {:active :default
+                                  :modes {:default {:grid multigrid}}
+                                   :page-coords [0 1]})
+                             0) => [1 0]
+      (#'sm/absolute-column (atom {:active :default
+                                   :modes {:default {:grid multigrid}}
+                                   :page-coords [0 1]})
+                            8) => [0 1])
+
