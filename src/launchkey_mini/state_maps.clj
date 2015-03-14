@@ -84,3 +84,17 @@
 (defn get-column [state colIndex] (grid/get-column (page-coords state) (active-grid state) colIndex))
 (defn absolute-column [state colIndex] (grid/absolute-column (page-coords state) (active-grid state) colIndex))
 
+(defn column-off [state column]
+  (let [grid (active-grid state)
+        new-grid (reduce (fn [new-grid row] (grid/set-cell (page-coords state) new-grid column row 0))
+                         grid
+                         (range 0 (count grid)))]
+    (swap! state assoc-in [:modes (mode state) :grid] new-grid)))
+
+
+(defn row-active? [state row]
+  (side/on? (active-side state) row (grid-y-page state)))
+
+(comment
+(def state (atom {:modes {:default {:grid [[0 1 0 0 0 0 0 0] [0 1 0 0 0 0 0 0] [0 1 0 0 0 0 0 0] [0 1 0 0 0 0 0 0]] :side [[1 1][0 0]]}}, :active :default, :page-coords [0 0]}))
+)

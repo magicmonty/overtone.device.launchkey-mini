@@ -343,3 +343,38 @@
                                    :page-coords [0 1]})
                             8) => [0 1])
 
+(fact "column-off sets a complete column to 0"
+      (@#'sm/column-off (atom {:active :default
+                              :modes {:default {:grid [[0 1 0 0 0 0 0 0]
+                                                       [0 1 0 0 0 0 0 0]
+                                                       [0 1 0 0 0 0 0 0]
+                                                       [0 1 0 0 0 0 0 0]]}}
+                              :page-coords [0 0]})
+                       1) => {:active :default
+                              :modes {:default {:grid [[0 0 0 0 0 0 0 0]
+                                                       [0 0 0 0 0 0 0 0]
+                                                       [0 0 0 0 0 0 0 0]
+                                                       [0 0 0 0 0 0 0 0]]}}
+                              :page-coords [0 0]})
+
+(fact "row-active? returns true, if side is active (by page)"
+      (@#'sm/row-active? (atom{:active :default
+                               :modes {:default {:side [[1 1][0 0]]}}
+                               :page-coords [0 0]})
+                         0) => truthy
+
+      (@#'sm/row-active? (atom{:active :default
+                               :modes {:default {:side [[1 1][0 0]]}}
+                               :page-coords [0 0]})
+                         1) => truthy)
+
+(fact "row-active? returns true, if side is inactive (by page)"
+      (@#'sm/row-active? (atom{:active :default
+                               :modes {:default {:side [[1 1][0 0]]}}
+                               :page-coords [0 1]})
+                         0) => falsey
+
+      (@#'sm/row-active? (atom{:active :default
+                               :modes {:default {:side [[1 1][0 0]]}}
+                               :page-coords [0 1]})
+                         1) => falsey)
