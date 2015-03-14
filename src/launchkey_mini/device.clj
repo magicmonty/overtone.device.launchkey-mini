@@ -170,7 +170,7 @@
 (defn- id->color [id]
   (nth [:orange :red :green] (mod id 3)))
 
-(defn- intromation [sink]
+(defn intromation [sink]
   "Runs a nice intromation on the device"
   (reset-launchkey* sink)
   (doall
@@ -183,19 +183,19 @@
           (doseq [color led/led-colors]
             (doseq [brightness (range led/low-brightness (+ led/full-brightness 1))]
               (doseq [row (range 0 grid/grid-height)]
-                (led-on* sink [row col] brightness color)
+                (led-on* sink [col row] brightness color)
                 (Thread/sleep (- refresh row)))))))
       (range 0 grid/grid-width)))
   (led-on-all* sink)
   (Thread/sleep 400)
   (doseq [col (reverse (range 0 grid/grid-width))]
     (doseq [row (reverse (range 0 grid/grid-height))]
-      (led-on* sink [row col] led/full-brightness (id->color (+ col (* row grid/grid-width))))
+      (led-on* sink [col row] led/full-brightness (id->color (+ col (* row grid/grid-width))))
       (Thread/sleep 70)))
   (Thread/sleep 400)
   (doseq [row (reverse (range 0 grid/grid-height))]
     (doseq [col (reverse (range 0 grid/grid-width))]
-      (led-off* sink [row col])
+      (led-off* sink [col row])
       (Thread/sleep 50)))
   (reset-launchkey* sink))
 
