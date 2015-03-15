@@ -98,6 +98,13 @@
 (defn absolute-row-active? [state row]
   (side/absolute-on? (active-side state) row))
 
+(defn set-page [state x-page y-page] (swap! state assoc :page-coords [x-page y-page]))
+(defn set-page-x [state x-page] (set-page state x-page (grid-y-page state)))
+(defn set-page-y [state y-page] (set-page state (grid-x-page state) y-page))
+(defn reset-page-position [state] (set-page state 0 0))
+
+(defn reset-state! [state] (reset! state (empty-state-map)))
+
 (comment
 (def state (atom {:modes {:default {:grid [[0 1 0 0 0 0 0 0] [0 1 0 0 0 0 0 0] [0 1 0 0 0 0 0 0] [0 1 0 0 0 0 0 0]] :side [[1 1][0 0]]}}, :active :default, :page-coords [0 0]}))
 )
