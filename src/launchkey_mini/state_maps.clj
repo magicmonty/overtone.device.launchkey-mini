@@ -103,6 +103,12 @@
 (defn set-page-y [state y-page] (set-page state (grid-x-page state) y-page))
 (defn reset-page-position [state] (set-page state 0 0))
 
+(defn shift-page-left [state]
+  (let [[x-page y-page] (page-coords state)]
+    (if (> x-page 0)
+      (swap! state assoc :page-coords [(dec x-page) y-page])
+      @state)))
+
 (defn reset-state! [state] (reset! state (empty-state-map)))
 
 (comment

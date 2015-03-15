@@ -424,3 +424,10 @@
                                                  :modes {:default ..changed-default-state..
                                                          :other   ..other-state..}
                                                  :page-coords [1 4]})
+
+(fact "shift-page-left decrements x-coordinate of page"
+      (@#'sm/shift-page-left (atom {:page-coords [2 3]})) => {:page-coords [1 3]})
+
+(fact "shift-page-left does not decremeny x-coordinate of page beyond 0"
+      (@#'sm/shift-page-left (atom {:page-coords [1 3]})) => {:page-coords [0 3]}
+      (@#'sm/shift-page-left (atom {:page-coords [0 3]})) => {:page-coords [0 3]})
