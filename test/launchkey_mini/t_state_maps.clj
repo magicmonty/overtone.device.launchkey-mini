@@ -432,9 +432,56 @@
       (@#'sm/shift-page-left (atom {:page-coords [1 3]})) => {:page-coords [0 3]}
       (@#'sm/shift-page-left (atom {:page-coords [0 3]})) => {:page-coords [0 3]})
 
+(fact "shift-page-right increments x-coordinate of page"
+      (@#'sm/shift-page-right (atom {:active :default
+                                     :modes {:default {:grid [[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+                                                              [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]]}}
+                                     :page-coords [0 0]})) => {:active :default
+                                                               :modes {:default {:grid [[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+                                                                                        [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]]}}
+                                                               :page-coords [1 0]})
+
+(fact "shift-page-right increments x-coordinate of page and appends new page to the right, if page does not exist"
+      (@#'sm/shift-page-right (atom {:active :default
+                                     :modes {:default {:grid [[0 0 0 0 0 0 0 0]
+                                                              [0 0 0 0 0 0 0 0]]}}
+                                     :page-coords [0 0]})) => {:active :default
+                                                               :modes {:default {:grid [[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+                                                                                        [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]]}}
+                                                               :page-coords [1 0]})
+
 (fact "shift-page-up decrements y-coordinate of page"
       (@#'sm/shift-page-up (atom {:page-coords [2 3]})) => {:page-coords [2 2]})
 
 (fact "shift-page-up does not decrement y-coordinate of page beyond 0"
       (@#'sm/shift-page-up (atom {:page-coords [2 1]})) => {:page-coords [2 0]}
       (@#'sm/shift-page-up (atom {:page-coords [2 0]})) => {:page-coords [2 0]})
+
+(fact "shift-page-down increments y-coordinate of page"
+      (@#'sm/shift-page-down (atom {:active :default
+                                    :modes {:default {:grid [[0 0 0 0 0 0 0 0]
+                                                             [0 0 0 0 0 0 0 0]
+                                                             [0 0 0 0 0 0 0 0]
+                                                             [0 0 0 0 0 0 0 0]]}}
+                                    :page-coords [0 0]})) => {:active :default
+                                                              :modes {:default {:grid [[0 0 0 0 0 0 0 0]
+                                                                                       [0 0 0 0 0 0 0 0]
+                                                                                       [0 0 0 0 0 0 0 0]
+                                                                                       [0 0 0 0 0 0 0 0]]}}
+                                                              :page-coords [0 1]})
+
+
+(fact "shift-page-down increments y-coordinate of page and appends new page to the bottom"
+      (@#'sm/shift-page-down (atom {:active :default
+                                    :modes {:default {:grid [[0 0 0 0 0 0 0 0]
+                                                             [0 0 0 0 0 0 0 0]]
+                                                      :side [[0 0]]}}
+                                    :page-coords [0 0]})) => {:active :default
+                                                              :modes {:default {:grid [[0 0 0 0 0 0 0 0]
+                                                                                       [0 0 0 0 0 0 0 0]
+                                                                                       [0 0 0 0 0 0 0 0]
+                                                                                       [0 0 0 0 0 0 0 0]]
+                                                                                :side [[0 0]
+                                                                                       [0 0]]}}
+                                                              :page-coords [0 1]})
+

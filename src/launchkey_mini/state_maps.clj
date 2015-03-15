@@ -109,11 +109,28 @@
       (set-page-x state (dec x-page))
       @state)))
 
+(defn shift-page-right [state]
+  (let [current-mode (mode state)
+        [x-page y-page] (page-coords state)
+        current-x-pages (grid/x-page-count (active-grid state))]
+    (when (>= (inc x-page) current-x-pages)
+      (swap! state assoc-in [:modes current-mode :grid] (grid/add-page-left (active-grid state))))
+    (swap! state assoc :page-coords [(inc x-page) y-page])))
+
 (defn shift-page-up [state]
   (let [y-page (grid-y-page state)]
     (if (> y-page 0)
       (set-page-y state (dec y-page))
       @state)))
+
+(defn shift-page-down [state]
+  (let [current-mode (mode state)
+        [x-page y-page] (page-coords state)
+        current-y-pages (grid/y-page-count (active-grid state))]
+    (when (>= (inc y-page) current-y-pages)
+      (swap! state assoc-in [:modes current-mode :grid] (grid/add-page-below (active-grid state)))
+      (swap! state assoc-in [:modes current-mode :side] (side/add-page-below (active-side state))))
+    (swap! state assoc :page-coords [x-page (inc y-page)])))
 
 (defn reset-state! [state] (reset! state (empty-state-map)))
 

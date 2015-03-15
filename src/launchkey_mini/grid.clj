@@ -153,7 +153,7 @@
   "adds a new page on the left side of the grid"
   (map #(concat % (take grid-width (repeat 0))) grid))
 
-(defn add-page-bottom [grid]
+(defn add-page-below [grid]
   "adds a new page on the bottom of the grid"
   (let [x (x-page-count  grid)]
     (concat grid (repeat grid-height (empty-row (* x grid-width))))))

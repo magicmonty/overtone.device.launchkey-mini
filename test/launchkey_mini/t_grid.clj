@@ -239,13 +239,13 @@
                                              [2 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0]
                                              [2 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0]])
 
-(fact "add-page-bottom adds two new rows"
-  (#'grid/add-page-bottom multi-page-grid) => [[1 0 0 0 0 0 0 1]
-                                               [1 0 0 0 0 0 0 1]
-                                               [2 0 0 0 0 0 0 2]
-                                               [2 0 0 0 0 0 0 2]
-                                               [0 0 0 0 0 0 0 0]
-                                               [0 0 0 0 0 0 0 0]])
+(fact "add-page-below adds two new rows"
+      (#'grid/add-page-below multi-page-grid) => [[1 0 0 0 0 0 0 1]
+                                                  [1 0 0 0 0 0 0 1]
+                                                  [2 0 0 0 0 0 0 2]
+                                                  [2 0 0 0 0 0 0 2]
+                                                  [0 0 0 0 0 0 0 0]
+                                                  [0 0 0 0 0 0 0 0]])
 
 (def multi-page-grid [[1 0 0 0 0 0 0 1]
                       [2 0 0 0 0 0 0 2]])
