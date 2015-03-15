@@ -485,3 +485,27 @@
                                                                                        [0 0]]}}
                                                               :page-coords [0 1]})
 
+
+(def test-state {:active :default
+                 :modes {:default {:grid [[0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
+                                          [2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3]
+                                          [4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5]
+                                          [6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7]]}}})
+
+(fact "complete-row returns complete row (by absolute position)"
+      (#'sm/complete-row (atom test-state) 0) => [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
+      (#'sm/complete-row (atom test-state) 1) => [2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3]
+      (#'sm/complete-row (atom test-state) 2) => [4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5]
+      (#'sm/complete-row (atom test-state) 3) => [6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7])
+
+(fact "write-complete-grid-row! replaces data of complete row"
+      (@#'sm/write-complete-grid-row! (atom test-state) 0 [8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9]) => {:active :default
+                                                                                                 :modes {:default {:grid [[8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9]
+                                                                                                                          [2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3]
+                                                                                                                          [4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5]
+                                                                                                                          [6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7]]}}}
+      (@#'sm/write-complete-grid-row! (atom test-state) 3 [8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9]) => {:active :default
+                                                                                                 :modes {:default {:grid [[0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
+                                                                                                                          [2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3]
+                                                                                                                          [4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5]
+                                                                                                                          [8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9]]}}})

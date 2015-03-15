@@ -134,6 +134,16 @@
 
 (defn reset-state! [state] (reset! state (empty-state-map)))
 
+(defn complete-row [state row]
+  "Return a single row spanning all dimensions"
+  (grid/complete-row (active-grid state) row))
+
+(defn write-complete-grid-row!
+  [state row row-data]
+  (let [new-grid (grid/write-complete-grid-row (active-grid state) row row-data)]
+    (swap! state assoc-in [:modes (mode state) :grid] new-grid)))
+
+
 (comment
 (def state (atom {:modes {:default {:grid [[0 1 0 0 0 0 0 0] [0 1 0 0 0 0 0 0] [0 1 0 0 0 0 0 0] [0 1 0 0 0 0 0 0]] :side [[1 1][0 0]]}}, :active :default, :page-coords [0 0]}))
 )
