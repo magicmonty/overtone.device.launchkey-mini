@@ -428,6 +428,13 @@
 (fact "shift-page-left decrements x-coordinate of page"
       (@#'sm/shift-page-left (atom {:page-coords [2 3]})) => {:page-coords [1 3]})
 
-(fact "shift-page-left does not decremeny x-coordinate of page beyond 0"
+(fact "shift-page-left does not decrement x-coordinate of page beyond 0"
       (@#'sm/shift-page-left (atom {:page-coords [1 3]})) => {:page-coords [0 3]}
       (@#'sm/shift-page-left (atom {:page-coords [0 3]})) => {:page-coords [0 3]})
+
+(fact "shift-page-up decrements y-coordinate of page"
+      (@#'sm/shift-page-up (atom {:page-coords [2 3]})) => {:page-coords [2 2]})
+
+(fact "shift-page-up does not decrement y-coordinate of page beyond 0"
+      (@#'sm/shift-page-up (atom {:page-coords [2 1]})) => {:page-coords [2 0]}
+      (@#'sm/shift-page-up (atom {:page-coords [2 0]})) => {:page-coords [2 0]})
