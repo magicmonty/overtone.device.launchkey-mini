@@ -394,8 +394,8 @@
                                   3) => truthy)
 
 (def test-state {:active :other
-                 :modes {:default ..changed-default-state..
-                         :other   ..other-state..}
+                 :modes {:default {}
+                         :other   {}}
                  :page-coords [2 3]})
 
 (fact "reset-state! resets state to empty state"
@@ -403,26 +403,26 @@
 
 (fact "reset-page-position resets page coordinates"
       (@#'sm/reset-page-position (atom test-state)) => {:active :other
-                                                        :modes {:default ..changed-default-state..
-                                                                :other   ..other-state..}
+                                                        :modes {:default {}
+                                                                :other   {}}
                                                         :page-coords [0 0]})
 
 (fact "set-page-x sets x-coordinate of page"
       (@#'sm/set-page-x (atom test-state) 0) => {:active :other
-                                                 :modes {:default ..changed-default-state..
-                                                         :other   ..other-state..}
+                                                 :modes {:default {}
+                                                         :other   {}}
                                                  :page-coords [0 3]})
 
 (fact "set-page-y sets y-coordinate of page"
       (@#'sm/set-page-y (atom test-state) 0) => {:active :other
-                                                 :modes {:default ..changed-default-state..
-                                                         :other   ..other-state..}
+                                                 :modes {:default {}
+                                                         :other   {}}
                                                  :page-coords [2 0]})
 
 (fact "set-page sets x- and y-coordinate of page"
       (@#'sm/set-page (atom test-state) 1 4) => {:active :other
-                                                 :modes {:default ..changed-default-state..
-                                                         :other   ..other-state..}
+                                                 :modes {:default {}
+                                                         :other   {}}
                                                  :page-coords [1 4]})
 
 (fact "shift-page-left decrements x-coordinate of page"
