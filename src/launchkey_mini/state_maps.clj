@@ -95,6 +95,9 @@
 (defn row-active? [state row]
   (side/on? (active-side state) row (grid-y-page state)))
 
+(defn absolute-row-active? [state row]
+  (side/absolute-on? (active-side state) row))
+
 (comment
 (def state (atom {:modes {:default {:grid [[0 1 0 0 0 0 0 0] [0 1 0 0 0 0 0 0] [0 1 0 0 0 0 0 0] [0 1 0 0 0 0 0 0]] :side [[1 1][0 0]]}}, :active :default, :page-coords [0 0]}))
 )

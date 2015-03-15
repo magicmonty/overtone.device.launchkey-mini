@@ -378,3 +378,17 @@
                                :modes {:default {:side [[1 1][0 0]]}}
                                :page-coords [0 1]})
                          1) => falsey)
+
+(fact "absolute-row-active? returns true, if side is active (absolute reference)"
+      (@#'sm/absolute-row-active? (atom{:active :default
+                                        :modes {:default {:side [[1 0][0 1]]}}})
+                                  0) => truthy
+      (@#'sm/absolute-row-active? (atom{:active :default
+                                        :modes {:default {:side [[1 0][0 1]]}}})
+                                  1) => falsey
+      (@#'sm/absolute-row-active? (atom{:active :default
+                                        :modes {:default {:side [[1 0][0 1]]}}})
+                                  2) => falsey
+      (@#'sm/absolute-row-active? (atom{:active :default
+                                        :modes {:default {:side [[1 0][0 1]]}}})
+                                  3) => truthy)
