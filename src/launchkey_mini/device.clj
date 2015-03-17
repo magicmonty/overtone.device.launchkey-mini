@@ -1,5 +1,8 @@
 (ns launchkey-mini.device
+  (:use launchkey-mini.util)
   (:require
+    [overtone.studio.midi :refer :all :as omidi]
+   [overtone.libs.event :refer :all :as oevent]
     [launchkey-mini.led :as led]
     [launchkey-mini.midi :as midi]
     [launchkey-mini.grid :as grid]
@@ -111,6 +114,13 @@
   (let [sink (-> launchkeymini :rcv)]
     (led-off* sink id)))
 
+(defn toggle-led
+  ([launchkeymini id cell-value] (toggle-led launchkeymini id cell-value led/full-brightness :amber))
+  ([launchkeymini id cell-value brightness color]
+     (if-not (= 0 cell-value)
+       (led-on launchkeymini id brightness color)
+       (led-off launchkeymini id))))
+
 (defn- led-flash-on* [sink id brightness color]
   (when-let [{led-id :note midi-fn :fn} (led-details id)]
     (midi-fn sink led-id (led/velocity {:color color :intensity brightness :mode :clear}))
@@ -217,3 +227,120 @@
       (Thread/sleep 50)))
   (reset-launchkey* sink))
 
+(defn- make-grid-on-event-handler [launchkeymini idx state column row note]
+  (fn [_]
+    (state-maps/toggle! state column row)
+    (toggle-led launchkeymini [column row] (state-maps/cell state column row))
+    (when-let [trigger-fn (state-maps/trigger-fn state column row)]
+      (if (= 0 (arg-count trigger-fn))
+        (trigger-fn)
+        (trigger-fn launchkeymini)))
+    (let [current-mode (state-maps/mode state)]
+      (event [:LKMiniInControl :grid-on idx current-mode]
+             :id [column row]
+             :note note
+             :launchkeymini launchkeymini
+             :idx idx))))
+
+(defn- make-grid-off-event-handler [launchkeymini idx state column row note]
+  (fn [_]
+    (let [current-mode (state-maps/mode state)]
+      (event [:LKMiniInControl :grid-off idx current-mode]
+             :id [column row]
+             :note note
+             :launchkeymini launchkeymini
+             :idx idx))))
+
+(defn- bind-grid-events [launchkeymini device-key idx state]
+  (doseq [[row notes] (map vector (iterate inc 0) (grid/get-page grid/grid-notes))
+          [column note] (map vector (iterate inc 0) notes)]
+    (let [type       :note-on
+          note       note
+          on-handle  (concat device-key [type note])
+          on-fn (make-grid-on-event-handler launchkeymini idx state column row note)
+          off-handle (concat device-key [:note-off note])
+          off-fn (make-grid-off-event-handler launchkeymini idx state column row note)]
+
+      (println :handle on-handle)
+      (println :handle off-handle)
+
+      (oevent/on-event on-handle  on-fn  (str "grid-on-event-for"  on-handle))
+      (oevent/on-event off-handle off-fn (str "grid-off-event-for" off-handle)))))
+
+
+(defn- make-side-event-handler [launchkeymini id state]
+  (fn [_]
+    (state-maps/toggle-side! state (side->row id))
+    (toggle-led launchkeymini id (state-maps/side-cell state (side->row id)))
+    (when-let [trigger-fn (state-maps/trigger-fn state id)]
+      (if (= 0 (arg-count trigger-fn))
+        (trigger-fn)
+        (trigger-fn launchkeymini)))))
+
+(defn- bind-side-events [launchkeymini device-key interfaces state]
+  (doseq [[id side-info] (-> interfaces :grid-controls :side-controls)]
+    (let [type      (:type side-info)
+          note      (:note side-info)
+          row       (:row side-info)
+          on-handle (concat device-key [type note])
+          on-fn (make-side-event-handler launchkeymini id state)]
+      (println :handle on-handle)
+      (on-event on-handle on-fn (str "side-on-event-for" on-handle)))))
+
+(defn- bind-metakey-events [launchkeymini device-key idx interfaces]
+  (doseq [[id meta-key-info] (-> interfaces :grid-controls :meta-keys)]
+    (let [type      (:type meta-key-info)
+          note      (:note meta-key-info)
+          on-handle (concat device-key [type note])
+          on-fn (fn [{:keys [data2-f]}]
+            (if (zero? data2-f)
+              (event [:LKMiniInControl :control (str id "-off")]
+                      :val data2-f
+                      :id id
+                      :launchkeymini launchkeymini
+                      :idx idx)
+
+              (event [:LKMiniInControl :control (str id "-on")]
+                      :val data2-f
+                      :id id
+                      :launchkeymini launchkeymini
+                      :idx idx))
+
+              (event [:LKMiniIncontrol :control id]
+                      :val data2-f
+                      :id id
+                      :launchkeymini launchkeymini
+                      :idx idx))]
+
+      (println :handle on-handle)
+      (on-event on-handle on-fn (str "metakey-on-event-for" on-handle)))))
+
+(defn- register-event-handlers-for-launchkeymini [device sink idx]
+  (let [launchkeymini  (map->LaunchkeyMini (assoc device :rcv sink))
+        interfaces     (:interfaces device)
+        device-key     (midi-full-device-key (:dev device))
+        state          (:state device)]
+    (bind-grid-events    launchkeymini device-key idx state)
+    (bind-side-events    launchkeymini device-key interfaces state)
+    (bind-metakey-events launchkeymini device-key idx interfaces)
+    launchkeymini))
+
+
+
+(defn stateful-launchkey [device]
+  (let [interfaces (-> launchkey-mini-config :interfaces)
+        state      (atom (state-maps/empty-state-map))
+        device-key (omidi/midi-full-device-key device)]
+    {:dev        device
+     :interfaces interfaces
+     :state      state
+     :type       ::stateful-launchkey}))
+
+(defn merge-launchkey-kons [sinks stateful-devs]
+  (doseq [sink sinks]
+    (enable-incontrol* sink)
+    (intromation* sink))
+  (doall
+    (map (fn [[stateful-dev sink id]]
+      (register-event-handlers-for-launchkeymini stateful-dev sink id))
+    (map vector stateful-devs sinks (range)))))
