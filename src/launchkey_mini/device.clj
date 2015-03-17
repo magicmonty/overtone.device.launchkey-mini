@@ -8,10 +8,13 @@
     [launchkey-mini.grid :as grid]
     [launchkey-mini.state-maps :as state-maps]))
 
+(def launchkeymini-midi-handle "LK Mini InControl")
+(def launchkeymini-event-id :LKMiniInControl)
+
 (defrecord LaunchkeyMini [rcv dev interfaces state])
 
 (def launchkey-mini-config {
-  :name "LK Mini InControl"
+  :name launchkeymini-midi-handle
   :interfaces {
     :grid-controls {
       :meta-keys {
@@ -37,7 +40,7 @@
     :leds {
       :name "LEDs"
       :type :midi-out
-      :midi-handle "LK Mini InControl"
+      :midi-handle launchkeymini-midi-handle
       :controls {
         :row1  {:note 104 :type :note-on}
         :row2  {:note 120 :type :note-on}}
@@ -230,13 +233,15 @@
 (defn- make-grid-on-event-handler [launchkeymini idx state column row note]
   (fn [_]
     (state-maps/toggle! state column row)
-    (toggle-led launchkeymini [column row] (state-maps/cell state column row))
+    (if (state-maps/session-mode? state (state-maps/mode state))
+      (toggle-led launchkeymini [column row] (state-maps/cell state column row))
+      (led-on launchkeymini [column row] led/full-brightness :red))
     (when-let [trigger-fn (state-maps/trigger-fn state column row)]
       (if (= 0 (arg-count trigger-fn))
         (trigger-fn)
         (trigger-fn launchkeymini)))
     (let [current-mode (state-maps/mode state)]
-      (event [:LKMiniInControl :grid-on idx current-mode]
+      (event [launchkeymini-event-id :grid-on idx current-mode]
              :id [column row]
              :note note
              :launchkeymini launchkeymini
@@ -245,7 +250,9 @@
 (defn- make-grid-off-event-handler [launchkeymini idx state column row note]
   (fn [_]
     (let [current-mode (state-maps/mode state)]
-      (event [:LKMiniInControl :grid-off idx current-mode]
+      (when-not (state-maps/session-mode? state current-mode)
+        (led-off launchkeymini [column row]))
+      (event [launchkeymini-event-id :grid-off idx current-mode]
              :id [column row]
              :note note
              :launchkeymini launchkeymini
@@ -293,20 +300,23 @@
           note      (:note meta-key-info)
           on-handle (concat device-key [type note])
           on-fn (fn [{:keys [data2-f]}]
+            (comment
+
             (if (zero? data2-f)
-              (event [:LKMiniInControl :control (str id "-off")]
+              (event [launchkeymini-event-id :control (str id "-off")]
                       :val data2-f
                       :id id
                       :launchkeymini launchkeymini
                       :idx idx)
 
-              (event [:LKMiniInControl :control (str id "-on")]
+              (event [launchkeymini-event-id :control (str id "-on")]
                       :val data2-f
                       :id id
                       :launchkeymini launchkeymini
                       :idx idx))
+              )
 
-              (event [:LKMiniIncontrol :control id]
+              (event [launchkeymini-event-id :control id]
                       :val data2-f
                       :id id
                       :launchkeymini launchkeymini
@@ -325,18 +335,16 @@
     (bind-metakey-events launchkeymini device-key idx interfaces)
     launchkeymini))
 
-
-
-(defn stateful-launchkey [device]
+(defn stateful-launchkeymini [device]
   (let [interfaces (-> launchkey-mini-config :interfaces)
         state      (atom (state-maps/empty-state-map))
         device-key (omidi/midi-full-device-key device)]
     {:dev        device
      :interfaces interfaces
      :state      state
-     :type       ::stateful-launchkey}))
+     :type       ::stateful-launchkeymini}))
 
-(defn merge-launchkey-kons [sinks stateful-devs]
+(defn merge-launchkeymini-kons [sinks stateful-devs]
   (doseq [sink sinks]
     (enable-incontrol* sink)
     (intromation* sink))
