@@ -189,14 +189,29 @@
     (let [sink (-> launchkeymini :rcv)]
       (render-side* sink side-data brightness color))))
 
+(defn led-off-all* [sink]
+  (doseq [row (range 0 grid/grid-height)]
+    (doseq [column (range 0 grid/grid-width)]
+      (led-off* sink [column row])))
+  (doseq [ctrl side-controls]
+    (led-off* sink ctrl)))
+
+(defn led-off-all [launchkeymini]
+  "Enable LED test mode, wich switches all LEDs on (:amber at medium brightness)"
+  (let [sink (-> launchkeymini :rcv)]
+    (led-off-all* sink)))
+
 (defn render-state
   "Renders the current state (grid and side)"
   ([launchkeymini] (render-state launchkeymini led/full-brightness :amber))
   ([launchkeymini brightness color]
-     (let [grid-data (state-maps/active-page (:state launchkeymini))
-           side-data (state-maps/active-side-page (:state launchkeymini))]
-       (render-grid launchkeymini grid-data brightness color)
-       (render-side launchkeymini side-data brightness color))))
+     (if (state-maps/session-mode? (:state launchkeymini))
+       (let [grid-data (state-maps/active-page (:state launchkeymini))
+             side-data (state-maps/active-side-page (:state launchkeymini))]
+         (render-grid launchkeymini grid-data brightness color)
+         (render-side launchkeymini side-data brightness color))
+
+       (led-off-all launchkeymini))))
 
 (defn- id->color [id]
   (nth [:orange :red :green] (mod id 3)))

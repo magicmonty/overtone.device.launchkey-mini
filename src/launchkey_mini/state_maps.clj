@@ -43,6 +43,9 @@
 (defn active-grid [state] ((active-mode state) :grid))
 (defn active-page [state] (grid/get-page (page-coords state) (active-grid state)))
 
+(defn x-max        [state] (grid/x-max (active-grid state)))
+(defn y-max        [state] (grid/y-max (active-grid state)))
+
 (defn on?
   ([state column row] (on? state column row (page-coords state)))
   ([state column row page-coords] (grid/on? page-coords (active-grid state) column row)))
