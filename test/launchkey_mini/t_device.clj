@@ -98,6 +98,28 @@
     (#'device/led-off* ..sink.. [6 0]) => true
     (#'device/led-off* ..sink.. [7 0]) => true))
 
+(fact "render-grid calls the correct commands"
+  (#'device/render-grid {:rcv ..sink..} [[0 1 0 0 0 1 0 0]
+                                         [1 0 1 1 1 0 1 1]]) => nil
+  (provided
+    (#'device/led-off* ..sink.. [0 0]) => true
+    (#'device/led-on*  ..sink.. [1 0] 3 :amber) => true
+    (#'device/led-off* ..sink.. [2 0]) => true
+    (#'device/led-off* ..sink.. [3 0]) => true
+    (#'device/led-off* ..sink.. [4 0]) => true
+    (#'device/led-on*  ..sink.. [5 0] 3 :amber) => true
+    (#'device/led-off* ..sink.. [6 0]) => true
+    (#'device/led-off* ..sink.. [7 0]) => true
+
+    (#'device/led-on*  ..sink.. [0 1] 3 :amber) => true
+    (#'device/led-off* ..sink.. [1 1]) => true
+    (#'device/led-on*  ..sink.. [2 1] 3 :amber) => true
+    (#'device/led-on*  ..sink.. [3 1] 3 :amber) => true
+    (#'device/led-on*  ..sink.. [4 1] 3 :amber) => true
+    (#'device/led-off* ..sink.. [5 1]) => true
+    (#'device/led-on*  ..sink.. [6 1] 3 :amber) => true
+    (#'device/led-on*  ..sink.. [7 1] 3 :amber) => true))
+
 (fact "render-side calls the correct commands"
   (#'device/render-side {:rcv ..sink..} [0 1]) => nil
   (provided

@@ -2,7 +2,8 @@
   (:require
     [launchkey-mini.led :as led]
     [launchkey-mini.midi :as midi]
-    [launchkey-mini.grid :as grid]))
+    [launchkey-mini.grid :as grid]
+    [launchkey-mini.state-maps :as state-maps]))
 
 (defrecord LaunchkeyMini [rcv dev interfaces state])
 
@@ -150,6 +151,14 @@
     (let [sink (-> launchkeymini :rcv)]
       (render-row* sink row-data row brightness color))))
 
+(defn render-grid
+  "Renders a complete visible grid."
+  ([launchkeymini grid] (render-grid launchkeymini grid led/full-brightness :amber))
+  ([launchkeymini grid brightness color]
+    (doseq [row (range 0 grid/grid-height)]
+      (let [row-data (nth grid row)]
+        (render-row launchkeymini row-data row brightness color)))))
+
 (defn- render-side*
   ([sink side-data] (render-side* sink side-data led/full-brightness :amber))
   ([sink side-data brightness color]
@@ -167,10 +176,19 @@
     (let [sink (-> launchkeymini :rcv)]
       (render-side* sink side-data brightness color))))
 
+(defn render-state
+  "Renders the current state (grid and side)"
+  ([launchkeymini] (render-state launchkeymini led/full-brightness :amber))
+  ([launchkeymini brightness color]
+     (let [grid-data (state-maps/active-page (:state launchkeymini))
+           side-data (state-maps/active-side (:state launchkeymini))]
+       (render-grid launchkeymini grid-data brightness color)
+       (render-side launchkeymini side-data brightness color))))
+
 (defn- id->color [id]
   (nth [:orange :red :green] (mod id 3)))
 
-(defn intromation [sink]
+(defn- intromation* [sink]
   "Runs a nice intromation on the device"
   (reset-launchkey* sink)
   (doall
