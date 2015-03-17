@@ -518,3 +518,36 @@
                                                                                                                           [2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3]
                                                                                                                           [4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5]
                                                                                                                           [8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9]]}}})
+
+(fact "disable-session-mode! sets session? in state to false"
+      (@#'sm/disable-session-mode! (atom {:active :default
+                                          :modes {:default {:session? true}}})) => {:active :default
+                                                                                    :modes {:default {:session? false}}}
+
+      (@#'sm/disable-session-mode! (atom {:active :default
+                                          :modes {:default {:session? true}
+                                                  :other {:session? true}}})
+                                   :other) => {:active :default
+                                               :modes {:default {:session? true}
+                                                       :other {:session? false}}})
+
+
+(fact "enable-session-mode! sets session? in state to true"
+      (@#'sm/enable-session-mode! (atom {:active :default
+                                         :modes {:default {:session? false}}})) => {:active :default
+                                                                                    :modes {:default {:session? true}}}
+
+      (@#'sm/enable-session-mode! (atom {:active :default
+                                         :modes {:default {:session? false}
+                                                 :other {:session? false}}})
+                                  :other) => {:active :default
+                                              :modes {:default {:session? false}
+                                                      :other {:session? true}}})
+
+(def test-state {:active :default
+                 :modes {:default {:session? true}
+                         :other {:session? false}}})
+
+(fact "session-mode? returns correct value"
+      (#'sm/session-mode? (atom test-state)) => truthy
+      (#'sm/session-mode? (atom test-state) :other) => falsey)

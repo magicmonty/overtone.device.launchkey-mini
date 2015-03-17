@@ -4,14 +4,14 @@
 
 (defn empty-mode []
   "defines a new empty mode"
-  {:grid (grid/empty-grid)
+  {:session? false
+   :grid (grid/empty-grid)
    :side (side/empty-side)})
 
 (defn empty-state-map []
   "defines the initial state"
   {
     :active :default
-    :session 0
     :modes {
       :default (empty-mode)
     }
@@ -27,7 +27,10 @@
 (defn page-coords  [state] (:page-coords @state))
 (defn- grid-y-page [state] (second (page-coords state)))
 (defn- grid-x-page [state] (first (page-coords state)))
-(defn- page-id     [state] (str (grid-x-page state) "x" (grid-y-page state)))
+(defn page-id      [state] (str (grid-x-page state) "x" (grid-y-page state)))
+
+(defn print-current-page [state]
+  (println (str "Mode: " (mode state) " / Page: " (page-coords state))))
 
 (defn add-mode [state mode-id]
   "Adds a new mode to the state"
@@ -49,8 +52,26 @@
     (and (= x-page (int (/ column grid/grid-width)))
          (= y-page (int (/ row grid/grid-height))))))
 
+(defn- set-session-mode [state mode value]
+  (swap! state assoc-in [:modes mode :session?] value))
 
-(defn- active-handle-key [state] (keyword (subs (str (mode state) "-" (page-id state)) 1)))
+(defn disable-session-mode!
+  ([state] (disable-session-mode! state (mode state)))
+  ([state mode]
+   (set-session-mode state mode false)))
+
+(defn enable-session-mode!
+  ([state] (enable-session-mode! state (mode state)))
+  ([state mode]
+   (set-session-mode state mode true)))
+
+(defn session-mode?
+  ([state] (session-mode? state (mode state)))
+  ([state mode] (get-in @state [:modes mode :session?])))
+
+
+(defn handle-key [state mode-id] (keyword (subs (str mode-id "-" (page-id state)) 1)))
+(defn- active-handle-key [state] (handle-key state (mode state)))
 (defn trigger-fn
   ([state column row] (trigger-fn state (str column "x" row)))
   ([state id]
