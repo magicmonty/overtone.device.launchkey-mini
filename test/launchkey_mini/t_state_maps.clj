@@ -49,9 +49,18 @@
       (provided
         (#'sm/empty-mode) => irrelevant :times 0))
 
-(fact "active-side returns side from active mode"
+(fact "active-side returns complete side from active mode"
       (#'sm/active-side (atom {:active :default
-                               :modes {:default {:side ..defaultside..}}})) => ..defaultside..)
+                               :modes {:default {:side [..side-page-1.. ..side-page-2..]}}
+                               :page-coords [0 0]})) => [..side-page-1.. ..side-page-2..])
+
+(fact "active-side-page returns currently active side from active mode"
+      (#'sm/active-side-page (atom {:active :default
+                                    :modes {:default {:side [..side-page-1.. ..side-page-2..]}}
+                                    :page-coords [0 0]})) => ..side-page-1..
+      (#'sm/active-side-page (atom {:active :default
+                                    :modes {:default {:side [..side-page-1.. ..side-page-2..]}}
+                                    :page-coords [0 1]})) => ..side-page-2..)
 
 (def multigrid [[0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
                 [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]

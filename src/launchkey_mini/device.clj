@@ -191,7 +191,7 @@
   ([launchkeymini] (render-state launchkeymini led/full-brightness :amber))
   ([launchkeymini brightness color]
      (let [grid-data (state-maps/active-page (:state launchkeymini))
-           side-data (state-maps/active-side (:state launchkeymini))]
+           side-data (state-maps/active-side-page (:state launchkeymini))]
        (render-grid launchkeymini grid-data brightness color)
        (render-side launchkeymini side-data brightness color))))
 

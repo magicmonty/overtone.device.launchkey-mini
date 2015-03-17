@@ -36,6 +36,7 @@
     (swap! state assoc-in [:modes mode-id] (empty-mode))))
 
 (defn active-side [state] ((active-mode state) :side))
+(defn active-side-page [state] (side/get-page (active-side state) (grid-y-page state)))
 (defn active-grid [state] ((active-mode state) :grid))
 (defn active-page [state] (grid/get-page (page-coords state) (active-grid state)))
 

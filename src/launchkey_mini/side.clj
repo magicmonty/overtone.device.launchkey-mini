@@ -35,6 +35,6 @@
   "Adds a new pair of"
   (conj side (empty-rows)))
 
-(defn get-page [side page]
+(defn get-page [side-data page-number]
   "Gets the specified page"
-  (nth side page))
+  (nth side-data page-number))
