@@ -218,6 +218,7 @@
 
 (defn- intromation* [sink]
   "Runs a nice intromation on the device"
+  (enable-incontrol* sink)
   (reset-launchkey* sink)
   (doall
     (pmap
@@ -228,11 +229,13 @@
           (Thread/sleep start-lag)
           (doseq [color led/led-colors]
             (doseq [brightness (range led/low-brightness (+ led/full-brightness 1))]
+              (doseq [row-side side-controls]
+                (led-on* sink row-side brightness color)
+                (Thread/sleep (- refresh (side->row row-side))))
               (doseq [row (range 0 grid/grid-height)]
                 (led-on* sink [col row] brightness color)
                 (Thread/sleep (- refresh row)))))))
       (range 0 grid/grid-width)))
-  (led-on-all* sink)
   (Thread/sleep 400)
   (doseq [col (reverse (range 0 grid/grid-width))]
     (doseq [row (reverse (range 0 grid/grid-height))]
