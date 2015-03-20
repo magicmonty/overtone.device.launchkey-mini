@@ -40,9 +40,21 @@ The state of the pads is not remembered but the pads can be bound individually.
 
 ## Bind keys
 
-* Bind a pad `(bind :mode :0x0 #(kick))`
-* Bind a round row-button `(bind :mode :row1 #(hat3))` or `(bind :mode :row2 #(kick))`
-* Bind a meta-key (not useable in session mode): `(bind :default :up (fn [launchkeymini] (println launchkeymini)))`
+Bind a pad
+```clojure
+(bind :mode :0x0 #(kick))
+```
+
+Bind the round row-buttons
+```clojure
+(bind :mode :row1 #(hat3))
+(bind :mode :row2 #(kick))
+```
+
+Bind a meta-key (no effect in session mode):
+```clojure
+(bind :default :up (fn [launchkeymini] (println launchkeymini)))
+```
 
 ## Events
 
@@ -107,5 +119,5 @@ Pad pressed:
 
 Pad released:
 ```clojure
-[:LKMiniInControl <device-index> <current mode id> :grid-of]
+[:LKMiniInControl <device-index> <current mode id> :grid-off]
 ```
