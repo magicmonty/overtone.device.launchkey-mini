@@ -137,13 +137,23 @@
       (set-page-x state (dec x-page))
       @state)))
 
+(defn- shift-page-right* [state current-mode next-x-page y-page x-page-count]
+  (when (>= next-x-page x-page-count)
+    (swap! state assoc-in [:modes current-mode :grid] (grid/add-page-left (active-grid state))))
+  (swap! state assoc :page-coords [next-x-page y-page]))
+
 (defn shift-page-right [state]
   (let [current-mode (mode state)
         [x-page y-page] (page-coords state)
-        current-x-pages (grid/x-page-count (active-grid state))]
-    (when (>= (inc x-page) current-x-pages)
-      (swap! state assoc-in [:modes current-mode :grid] (grid/add-page-left (active-grid state))))
-    (swap! state assoc :page-coords [(inc x-page) y-page])))
+        x-page-count (grid/x-page-count (active-grid state))
+        next-x-page (inc x-page)]
+
+    (if-let [page-max-x (get-in @state [:modes current-mode :page-max-x])]
+      (if (<= next-x-page page-max-x)
+        (shift-page-right* state current-mode next-x-page y-page x-page-count)
+        @state)
+
+      (shift-page-right* state current-mode next-x-page y-page x-page-count))))
 
 (defn shift-page-up [state]
   (let [y-page (grid-y-page state)]
@@ -151,14 +161,32 @@
       (set-page-y state (dec y-page))
       @state)))
 
+(defn- shift-page-down* [state current-mode x-page next-y-page y-page-count]
+  (when (>= next-y-page y-page-count)
+    (swap! state assoc-in [:modes current-mode :grid] (grid/add-page-below (active-grid state)))
+    (swap! state assoc-in [:modes current-mode :side] (side/add-page-below (active-side state))))
+  (swap! state assoc :page-coords [x-page next-y-page]))
+
 (defn shift-page-down [state]
   (let [current-mode (mode state)
         [x-page y-page] (page-coords state)
-        current-y-pages (grid/y-page-count (active-grid state))]
-    (when (>= (inc y-page) current-y-pages)
-      (swap! state assoc-in [:modes current-mode :grid] (grid/add-page-below (active-grid state)))
-      (swap! state assoc-in [:modes current-mode :side] (side/add-page-below (active-side state))))
-    (swap! state assoc :page-coords [x-page (inc y-page)])))
+        y-page-count (grid/y-page-count (active-grid state))
+        next-y-page (inc y-page)]
+
+    (if-let [page-max-y (get-in @state [:modes current-mode :page-max-y])]
+      (if (<= next-y-page page-max-y)
+        (shift-page-down* state current-mode x-page next-y-page y-page-count)
+        @state)
+
+      (shift-page-down* state current-mode x-page next-y-page y-page-count))))
+
+(defn set-page-max-x
+  ([state value] (set-page-max-x state (mode state) value))
+  ([state mode value] (swap! state assoc-in [:modes mode :page-max-x] value)))
+
+(defn set-page-max-y
+  ([state value] (set-page-max-y state (mode state) value))
+  ([state mode value] (swap! state assoc-in [:modes mode :page-max-y] value)))
 
 (defn reset-state! [state] (reset! state (empty-state-map)))
 

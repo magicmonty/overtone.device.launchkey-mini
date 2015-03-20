@@ -26,14 +26,19 @@ This code is mainly based on the work of @josephwilk at https://github.com/josep
 
 (add-mode! :sequencer) ; adds a new mode
 (enable-session-mode :sequencer) ; enables session mode and makes the pads pageable
+(set-page-max-x 1) ; set max 2 horizontal pages (endless if not set)
+(set-page-max-y 1) ; set max 2 horizontal pages (endless if not set)
 
 (set-mode :sequencer) ; switches to the mode with the ID :sequencer
 (set-mode :drumpad) ; switches to the mode with the ID :drumpad
 ```
 
 In session mode you have an infinite virtual grid via the up/down/left/right keys.
-New pages will be added automatically after the last page. In session mode,
-the state of the pad-keys (on/off) will be remembered automatically by state.
+New pages will be added automatically after the last page.
+You can limit the page count manually by setting `(set-page-max-r <mode-id> <last page no>)`
+resp. `(set-page-max-y <mode-id> <last page no>)`.
+
+In session mode, the state of the pad-keys (on/off) will be remembered automatically by state.
 
 In non-session mode the up/down/left- and right-keys are also bindable.
 The state of the pads is not remembered but the pads can be bound individually.

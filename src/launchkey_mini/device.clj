@@ -393,7 +393,7 @@
   (doseq [sink sinks]
     (enable-incontrol* sink)
     (reset-launchkey* sink)
-    (comment (intromation* sink)))
+    (intromation* sink))
   (doall
     (map (fn [[stateful-dev sink id]]
       (register-event-handlers-for-launchkeymini stateful-dev sink id))

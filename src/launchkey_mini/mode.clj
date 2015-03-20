@@ -31,3 +31,11 @@
       (state-maps/reset-page-position state)
       (swap! state assoc :active mode-id))
     (device/render-state launchkeymini)))
+
+(defn set-page-max-x
+  ([mode-id value] (set-page-max-x (first launchkeymini-kons) mode-id value))
+  ([launchkeymini mode-id value] (state-maps/set-page-max-x (:state launchkeymini) mode-id value)))
+
+(defn set-page-max-y
+  ([mode-id value] (set-page-max-y (first launchkeymini-kons) mode-id value))
+  ([launchkeymini mode-id value] (state-maps/set-page-max-y (:state launchkeymini) mode-id value)))
