@@ -321,7 +321,7 @@
 (defn- on-metakey-on [launchkeymini idx interfaces id value]
   (let [session-fn (-> interfaces :grid-controls :meta-keys id :session-fn)
         current-state (:state launchkeymini)
-        current-mode (state-maps/mode state)]
+        current-mode (state-maps/mode current-state)]
     (if (state-maps/session-mode? current-state)
       ; paging in session mode
       ((session-fn current-state)
@@ -342,7 +342,7 @@
 
 (defn- on-metakey-off [launchkeymini idx id value]
   (let [current-state (:state launchkeymini)
-        current-mode (state-maps/mode state)]
+        current-mode (state-maps/mode current-state)]
     (event [launchkeymini-event-id idx current-mode :meta (keyword (subs (str id "-off") 1))]
            :val value
            :id id
@@ -352,7 +352,7 @@
 (defn- bind-metakey-events [launchkeymini device-key idx interfaces]
   (doseq [[id meta-key-info] (-> interfaces :grid-controls :meta-keys)]
     (let [current-state (:state launchkeymini)
-          current-mode  (state-maps/mode state)
+          current-mode  (state-maps/mode current-state)
           type          (:type meta-key-info)
           note          (:note meta-key-info)
           on-handle     (concat device-key [type note])
