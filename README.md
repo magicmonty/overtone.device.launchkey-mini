@@ -50,14 +50,30 @@ The state of the pads is not remembered but the pads can be bound individually.
 
 The Meta-Keys send multiple events:
 
-** Up-Key pressed:     `[:LKMiniInControl <device-index> <current mode id> :meta :up-on]`     `[:LKMiniInControl <device-index> <current mode id> :meta :up]`
-** Up-Key released:    `[:LKMiniInControl <device-index> <current mode id> :meta :up-off]`    `[:LKMiniInControl <device-index> <current mode id> :meta :up]`
-** Down-Key pressed:   `[:LKMiniInControl <device-index> <current mode id> :meta :down-on]`   `[:LKMiniInControl <device-index> <current mode id> :meta :down]`
-** Down-Key released:  `[:LKMiniInControl <device-index> <current mode id> :meta :down-off]`  `[:LKMiniInControl <device-index> <current mode id> :meta :down]`
-** Left-Key pressed:   `[:LKMiniInControl <device-index> <current mode id> :meta :left-on]`   `[:LKMiniInControl <device-index> <current mode id> :meta :left]`
-** Left-Key released:  `[:LKMiniInControl <device-index> <current mode id> :meta :left-off]`  `[:LKMiniInControl <device-index> <current mode id> :meta :left]`
-** Right-Key pressed:  `[:LKMiniInControl <device-index> <current mode id> :meta :right-on]`  `[:LKMiniInControl <device-index> <current mode id> :meta :right]`
-** Right-Key released: `[:LKMiniInControl <device-index> <current mode id> :meta :right-off]` `[:LKMiniInControl <device-index> <current mode id> :meta :right]`
+* Up-Key pressed:
+  `[:LKMiniInControl <device-index> <current mode id> :meta :up-on]`
+  `[:LKMiniInControl <device-index> <current mode id> :meta :up]`
+* Up-Key released:
+  `[:LKMiniInControl <device-index> <current mode id> :meta :up-off]`
+  `[:LKMiniInControl <device-index> <current mode id> :meta :up]`
+* Down-Key pressed:
+  `[:LKMiniInControl <device-index> <current mode id> :meta :down-on]`
+  `[:LKMiniInControl <device-index> <current mode id> :meta :down]`
+* Down-Key released:
+  `[:LKMiniInControl <device-index> <current mode id> :meta :down-off]`
+  `[:LKMiniInControl <device-index> <current mode id> :meta :down]`
+* Left-Key pressed:
+  `[:LKMiniInControl <device-index> <current mode id> :meta :left-on]`
+  `[:LKMiniInControl <device-index> <current mode id> :meta :left]`
+* Left-Key released:
+  `[:LKMiniInControl <device-index> <current mode id> :meta :left-off]`
+  `[:LKMiniInControl <device-index> <current mode id> :meta :left]`
+* Right-Key pressed:
+  `[:LKMiniInControl <device-index> <current mode id> :meta :right-on]`
+  `[:LKMiniInControl <device-index> <current mode id> :meta :right]`
+* Right-Key released:
+  `[:LKMiniInControl <device-index> <current mode id> :meta :right-off]`
+  `[:LKMiniInControl <device-index> <current mode id> :meta :right]`
 
 ### Pads
 
