@@ -28,46 +28,11 @@
      ([cell fun] (bind (first launchkeymini-kons) (state-maps/mode (:state (first launchkeymini-kons))) cell fun))
      ([mode cell fun] (bind (first launchkeymini-kons) mode cell fun))
      ([launchkeymini mode cell fun]
-      (let [current-state (:state launchkeymini)
-            bind-handle (state-maps/handle-key current-state mode)]
+      (let [[mode page] (if (sequential? mode) mode [mode 0])
+            current-state (:state launchkeymini)
+            bind-handle (state-maps/handle-key current-state mode [0 page])]
         (assert (state-maps/mode? current-state mode))
-        (swap! current-state assoc-in [:fn-map bind-handle cell] fun))))
-
-  (e/on-event [device/launchkeymini-event-id :control :up]
-              (fn [{lkm :launchkeymini val :val}]
-                (let [current-state (:state lkm)]
-                  (when (and (state-maps/session-mode? current-state) (= 1.0 val))
-                    (state-maps/shift-page-up current-state)
-                    (state-maps/print-current-page current-state)
-                    (device/render-state lkm))))
-              ::up-handler)
-
-  (e/on-event [device/launchkeymini-event-id :control :down]
-              (fn [{lkm :launchkeymini val :val}]
-                (let [current-state (:state lkm)]
-                  (when (and (state-maps/session-mode? current-state) (= 1.0 val))
-                    (state-maps/shift-page-down current-state)
-                    (state-maps/print-current-page current-state)
-                    (device/render-state lkm))))
-              ::down-handler)
-
-  (e/on-event [device/launchkeymini-event-id :control :left]
-              (fn [{lkm :launchkeymini val :val}]
-                (let [current-state (:state lkm)]
-                  (when (and (state-maps/session-mode? current-state) (= 1.0 val))
-                    (state-maps/shift-page-left current-state)
-                    (state-maps/print-current-page current-state)
-                    (device/render-state lkm))))
-              ::left-handler)
-
-  (e/on-event [device/launchkeymini-event-id :control :right]
-              (fn [{lkm :launchkeymini val :val}]
-                (let [current-state (:state lkm)]
-                  (when (and (state-maps/session-mode? current-state) (= 1.0 val))
-                    (state-maps/shift-page-right current-state)
-                    (state-maps/print-current-page current-state)
-                    (device/render-state lkm))))
-              ::right-handler))
+        (swap! current-state assoc-in [:fn-map bind-handle cell] fun)))))
 
 (comment
   (use 'launchkey-mini.core)

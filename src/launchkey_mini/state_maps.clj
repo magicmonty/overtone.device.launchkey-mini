@@ -25,8 +25,8 @@
 (defn active-mode? [state candidate-mode] (= candidate-mode (mode state)))
 (defn active-mode  [state] (-> ((mode state) (:modes @state))))
 (defn page-coords  [state] (:page-coords @state))
-(defn- grid-y-page [state] (second (page-coords state)))
-(defn- grid-x-page [state] (first (page-coords state)))
+(defn grid-y-page [state] (second (page-coords state)))
+(defn grid-x-page [state] (first (page-coords state)))
 (defn page-id      [state] (str (grid-x-page state) "x" (grid-y-page state)))
 
 (defn print-current-page [state]
@@ -73,7 +73,10 @@
   ([state mode] (get-in @state [:modes mode :session?])))
 
 
-(defn handle-key [state mode-id] (keyword (subs (str mode-id "-" (page-id state)) 1)))
+(defn handle-key
+  ([state mode-id] (handle-key state mode-id (page-coords state)))
+  ([state mode-id [column row]] (keyword (subs (str mode-id "-" column "x" row) 1))))
+
 (defn- active-handle-key [state] (handle-key state (mode state)))
 (defn trigger-fn
   ([state column row] (trigger-fn state (str column "x" row)))

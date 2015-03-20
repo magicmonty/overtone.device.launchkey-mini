@@ -18,10 +18,10 @@
   :interfaces {
     :grid-controls {
       :meta-keys {
-        :up      {:note 104 :type :control-change}
-        :down    {:note 105 :type :control-change}
-        :left    {:note 106 :type :control-change}
-        :right   {:note 107 :type :control-change}}
+        :up      {:note 104 :type :control-change :session-fn state-maps/shift-page-up}
+        :down    {:note 105 :type :control-change :session-fn state-maps/shift-page-down}
+        :left    {:note 106 :type :control-change :session-fn state-maps/shift-page-left}
+        :right   {:note 107 :type :control-change :session-fn state-maps/shift-page-right}}
 
       :side-controls {
         :row1  {:note 104 :type :note-on :row 0}
@@ -159,6 +159,12 @@
   "Renders a complete row. You have to provide the row-data
   as seqence of length launchkey-mini.grid/grid-length
   and a row number (zero based)"
+  ([launchkeymini row] (render-row launchkeymini row led/full-brightness :amber))
+  ([launchkeymini row brightness color]
+     (let [grid (seq (state-maps/active-page (:state launchkeymini)))]
+       (doseq [column (range grid/grid-width)]
+         (toggle-led launchkeymini [column row] (grid/cell grid column row) brightness color))))
+
   ([launchkeymini row-data row] (render-row launchkeymini row-data row led/full-brightness :amber))
   ([launchkeymini row-data row brightness color]
     (let [sink (-> launchkeymini :rcv)]
@@ -259,7 +265,7 @@
         (trigger-fn)
         (trigger-fn launchkeymini)))
     (let [current-mode (state-maps/mode state)]
-      (event [launchkeymini-event-id :grid-on idx current-mode]
+      (event [launchkeymini-event-id idx current-mode :grid-on]
              :id [column row]
              :note note
              :launchkeymini launchkeymini
@@ -270,7 +276,7 @@
     (let [current-mode (state-maps/mode state)]
       (when-not (state-maps/session-mode? state current-mode)
         (led-off launchkeymini [column row]))
-      (event [launchkeymini-event-id :grid-off idx current-mode]
+      (event [launchkeymini-event-id idx current-mode :grid-off]
              :id [column row]
              :note note
              :launchkeymini launchkeymini
@@ -310,38 +316,59 @@
           on-handle (concat device-key [type note])
           on-fn (make-side-event-handler launchkeymini id state)]
       (println :handle on-handle)
-      (on-event on-handle on-fn (str "side-on-event-for" on-handle)))))
+      (oevent/on-event on-handle on-fn (str "side-on-event-for" on-handle)))))
+
+(defn- on-metakey-on [launchkeymini idx interfaces id value]
+  (let [session-fn (-> interfaces :grid-controls :meta-keys id :session-fn)
+        current-state (:state launchkeymini)
+        current-mode (state-maps/mode state)]
+    (if (state-maps/session-mode? current-state)
+      ; paging in session mode
+      ((session-fn current-state)
+      (state-maps/print-current-page current-state)
+      (render-state launchkeymini))
+
+      ;bindable if not in session mode
+      (when-let [trigger-fn (state-maps/trigger-fn current-state id)]
+         (if (= 0 (arg-count trigger-fn))
+           (trigger-fn)
+           (trigger-fn launchkeymini))))
+
+    (event [launchkeymini-event-id idx current-mode :meta (keyword (subs (str id "-on") 1))]
+           :val value
+           :id id
+           :launchkeymini launchkeymini
+           :idx idx)))
+
+(defn- on-metakey-off [launchkeymini idx id value]
+  (let [current-state (:state launchkeymini)
+        current-mode (state-maps/mode state)]
+    (event [launchkeymini-event-id idx current-mode :meta (keyword (subs (str id "-off") 1))]
+           :val value
+           :id id
+           :launchkeymini launchkeymini
+           :idx idx)))
 
 (defn- bind-metakey-events [launchkeymini device-key idx interfaces]
   (doseq [[id meta-key-info] (-> interfaces :grid-controls :meta-keys)]
-    (let [type      (:type meta-key-info)
-          note      (:note meta-key-info)
-          on-handle (concat device-key [type note])
+    (let [current-state (:state launchkeymini)
+          current-mode  (state-maps/mode state)
+          type          (:type meta-key-info)
+          note          (:note meta-key-info)
+          on-handle     (concat device-key [type note])
           on-fn (fn [{:keys [data2-f]}]
-            (comment
-
             (if (zero? data2-f)
-              (event [launchkeymini-event-id :control (str id "-off")]
-                      :val data2-f
-                      :id id
-                      :launchkeymini launchkeymini
-                      :idx idx)
+              (on-metakey-off launchkeymini idx id data2-f)
+              (on-metakey-on  launchkeymini idx interfaces id data2-f))
 
-              (event [launchkeymini-event-id :control (str id "-on")]
-                      :val data2-f
-                      :id id
-                      :launchkeymini launchkeymini
-                      :idx idx))
-              )
-
-              (event [launchkeymini-event-id :control id]
+              (event [launchkeymini-event-id idx current-state :meta id]
                       :val data2-f
                       :id id
                       :launchkeymini launchkeymini
                       :idx idx))]
 
       (println :handle on-handle)
-      (on-event on-handle on-fn (str "metakey-on-event-for" on-handle)))))
+      (oevent/on-event on-handle on-fn (str "metakey-on-event-for" on-handle)))))
 
 (defn- register-event-handlers-for-launchkeymini [device sink idx]
   (let [launchkeymini  (map->LaunchkeyMini (assoc device :rcv sink))
@@ -365,7 +392,8 @@
 (defn merge-launchkeymini-kons [sinks stateful-devs]
   (doseq [sink sinks]
     (enable-incontrol* sink)
-    (intromation* sink))
+    (reset-launchkey* sink)
+    (comment (intromation* sink)))
   (doall
     (map (fn [[stateful-dev sink id]]
       (register-event-handlers-for-launchkeymini stateful-dev sink id))
