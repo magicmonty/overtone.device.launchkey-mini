@@ -1,6 +1,7 @@
 # overtone.device.launchkey-mini
 
 [![Build Status](https://travis-ci.org/magicmonty/overtone.device.launchkey-mini.svg?branch=master)](https://travis-ci.org/magicmonty/overtone.device.launchkey-mini)
+[![Clojars Project](http://clojars.org/overtone.device.launchkey-mini/latest-version.svg)](http://clojars.org/overtone.device.launchkey-mini)
 
 A Clojure library designed to use the Novation Launchkey Mini with [Overtone](http://overtone.github.io)
 
@@ -8,6 +9,22 @@ This code is mainly based on the work of @josephwilk at https://github.com/josep
 
 
 # Usage
+
+## installation
+```bash
+# Install lein2
+# https://github.com/technomancy/leiningen
+
+$ lein new mynewproject
+
+# add the following dependencies to mynewproject/project.clj
+# [org.clojure/clojure "1.5.1"]
+# [overtone "0.9.1"]
+# [overtone.device.launchkey-mini "0.1.0"]
+
+$ cd mynewproject
+$ lein repl
+```
 
 ## Startup
 
