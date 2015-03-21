@@ -87,7 +87,12 @@
     (#'midi/midi-control ..sink.. 0x00 0x7D) => true))
 
 (fact "render-row calls the correct commands"
-  (#'device/render-row {:rcv ..sink..} [0 1 0 0 0 1 0 0] 0) => nil
+  (#'device/render-row {:rcv ..sink..
+                        :state (atom {:active :default
+                                :modes {:default {:side [[1 1]]}}
+                                :page-coords [0 0]})}
+                       [0 1 0 0 0 1 0 0]
+                       0) => nil
   (provided
     (#'device/led-off* ..sink.. [0 0]) => true
     (#'device/led-on*  ..sink.. [1 0] 3 :amber) => true
@@ -98,9 +103,30 @@
     (#'device/led-off* ..sink.. [6 0]) => true
     (#'device/led-off* ..sink.. [7 0]) => true))
 
+(fact "render-row renders row in low brightness if row is not active"
+  (#'device/render-row {:rcv ..sink..
+                        :state (atom {:active :default
+                                :modes {:default {:side [[0 1]]}}
+                                :page-coords [0 0]})}
+                       [0 1 0 0 0 1 0 0]
+                       0) => nil
+  (provided
+    (#'device/led-off* ..sink.. [0 0]) => true
+    (#'device/led-on*  ..sink.. [1 0] 1 :amber) => true
+    (#'device/led-off* ..sink.. [2 0]) => true
+    (#'device/led-off* ..sink.. [3 0]) => true
+    (#'device/led-off* ..sink.. [4 0]) => true
+    (#'device/led-on*  ..sink.. [5 0] 1 :amber) => true
+    (#'device/led-off* ..sink.. [6 0]) => true
+    (#'device/led-off* ..sink.. [7 0]) => true))
+
 (fact "render-grid calls the correct commands"
-  (#'device/render-grid {:rcv ..sink..} [[0 1 0 0 0 1 0 0]
-                                         [1 0 1 1 1 0 1 1]]) => nil
+  (#'device/render-grid {:rcv ..sink..
+                         :state (atom {:active :default
+                                :modes {:default {:side [[1 1]]}}
+                                :page-coords [0 0]})}
+                        [[0 1 0 0 0 1 0 0]
+                         [1 0 1 1 1 0 1 1]]) => nil
   (provided
     (#'device/led-off* ..sink.. [0 0]) => true
     (#'device/led-on*  ..sink.. [1 0] 3 :amber) => true
@@ -119,6 +145,32 @@
     (#'device/led-off* ..sink.. [5 1]) => true
     (#'device/led-on*  ..sink.. [6 1] 3 :amber) => true
     (#'device/led-on*  ..sink.. [7 1] 3 :amber) => true))
+
+(fact "render-grid renders inactive rows in low brightness"
+  (#'device/render-grid {:rcv ..sink..
+                         :state (atom {:active :default
+                                :modes {:default {:side [[1 0]]}}
+                                :page-coords [0 0]})}
+                        [[0 1 0 0 0 1 0 0]
+                         [1 0 1 1 1 0 1 1]]) => nil
+  (provided
+    (#'device/led-off* ..sink.. [0 0]) => true
+    (#'device/led-on*  ..sink.. [1 0] 3 :amber) => true
+    (#'device/led-off* ..sink.. [2 0]) => true
+    (#'device/led-off* ..sink.. [3 0]) => true
+    (#'device/led-off* ..sink.. [4 0]) => true
+    (#'device/led-on*  ..sink.. [5 0] 3 :amber) => true
+    (#'device/led-off* ..sink.. [6 0]) => true
+    (#'device/led-off* ..sink.. [7 0]) => true
+
+    (#'device/led-on*  ..sink.. [0 1] 1 :amber) => true
+    (#'device/led-off* ..sink.. [1 1]) => true
+    (#'device/led-on*  ..sink.. [2 1] 1 :amber) => true
+    (#'device/led-on*  ..sink.. [3 1] 1 :amber) => true
+    (#'device/led-on*  ..sink.. [4 1] 1 :amber) => true
+    (#'device/led-off* ..sink.. [5 1]) => true
+    (#'device/led-on*  ..sink.. [6 1] 1 :amber) => true
+    (#'device/led-on*  ..sink.. [7 1] 1 :amber) => true))
 
 (fact "render-side calls the correct commands"
   (#'device/render-side {:rcv ..sink..} [0 1]) => nil

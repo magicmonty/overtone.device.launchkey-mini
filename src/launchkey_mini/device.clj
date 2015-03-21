@@ -167,8 +167,9 @@
 
   ([launchkeymini row-data row] (render-row launchkeymini row-data row led/full-brightness :amber))
   ([launchkeymini row-data row brightness color]
-    (let [sink (-> launchkeymini :rcv)]
-      (render-row* sink row-data row brightness color))))
+    (let [sink (-> launchkeymini :rcv)
+          thebrightness (if (state-maps/row-active? (:state launchkeymini) row) brightness led/low-brightness)]
+      (render-row* sink row-data row thebrightness color))))
 
 (defn render-grid
   "Renders a complete visible grid."
@@ -266,7 +267,8 @@
   (fn [_]
     (state-maps/toggle! state column row)
     (if (state-maps/session-mode? state (state-maps/mode state))
-      (toggle-led launchkeymini [column row] (state-maps/cell state column row))
+      (let [brightness (if (state-maps/row-active? state row) led/full-brightness led/low-brightness)]
+        (toggle-led launchkeymini [column row] (state-maps/cell state column row) brightness :amber))
       (led-on launchkeymini [column row] led/full-brightness :red))
     (invoke-trigger-fn launchkeymini column row)
     (let [current-mode (state-maps/mode state)]
@@ -306,9 +308,11 @@
 
 (defn- make-side-event-handler [launchkeymini id state]
   (fn [_]
-    (state-maps/toggle-side! state (side->row id))
-    (toggle-led launchkeymini id (state-maps/side-cell state (side->row id)))
-    (invoke-trigger-fn launchkeymini id)))
+    (let [row (side->row id)]
+      (state-maps/toggle-side! state row)
+      (toggle-led launchkeymini id (state-maps/side-cell state row))
+      (render-state launchkeymini)
+      (invoke-trigger-fn launchkeymini id))))
 
 (defn- bind-side-events [launchkeymini device-key interfaces state]
   (doseq [[id side-info] (-> interfaces :grid-controls :side-controls)]
