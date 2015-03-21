@@ -157,3 +157,12 @@ Pad released:
 ```clojure
 [:LKMiniInControl <device-index> <current mode id> :grid-off]
 ```
+
+### Row (Side) controls
+
+Both row controls send the following event:
+```clojure
+[:LKMiniInControl <device-index> <current mode id> :side]
+```
+
+Which button was pressed can be determined via the `:id` or the `:row` in the event data.

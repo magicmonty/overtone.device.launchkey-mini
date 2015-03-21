@@ -306,21 +306,27 @@
       (oevent/on-event off-handle off-fn (str "grid-off-event-for" off-handle)))))
 
 
-(defn- make-side-event-handler [launchkeymini id state]
-  (fn [_]
-    (let [row (side->row id)]
+(defn- make-side-event-handler [launchkeymini idx id state]
+  (let [row (side->row id)]
+    (fn [_]
       (state-maps/toggle-side! state row)
       (toggle-led launchkeymini id (state-maps/side-cell state row))
       (render-state launchkeymini)
-      (invoke-trigger-fn launchkeymini id))))
+      (invoke-trigger-fn launchkeymini id)
 
-(defn- bind-side-events [launchkeymini device-key interfaces state]
+      (event [launchkeymini-event-id idx (state-maps/mode state) :side]
+             :id id
+             :row row
+             :launchkeymini launchkeymini
+             :idx idx))))
+
+(defn- bind-side-events [launchkeymini device-key idx interfaces state]
   (doseq [[id side-info] (-> interfaces :grid-controls :side-controls)]
     (let [type      (:type side-info)
           note      (:note side-info)
           row       (:row side-info)
           on-handle (concat device-key [type note])
-          on-fn (make-side-event-handler launchkeymini id state)]
+          on-fn (make-side-event-handler launchkeymini idx id state)]
       (println :handle on-handle)
       (oevent/on-event on-handle on-fn (str "side-on-event-for" on-handle)))))
 
@@ -413,7 +419,7 @@
         device-key     (midi-full-device-key (:dev device))
         state          (:state device)]
     (bind-grid-events    launchkeymini device-key idx state)
-    (bind-side-events    launchkeymini device-key interfaces state)
+    (bind-side-events    launchkeymini device-key idx interfaces state)
     (bind-metakey-events launchkeymini device-key idx interfaces)
     (bind-knob-events    launchkeymini device-key idx interfaces)
     launchkeymini))
