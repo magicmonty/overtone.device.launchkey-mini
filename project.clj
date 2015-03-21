@@ -1,4 +1,4 @@
-(defproject launchkey-mini "0.1.0-SNAPSHOT"
+(defproject overtone.device.launchkey-mini "0.1.0"
   :description "Use Novation Launchkey Mini with Overtone"
   :url "http://github.com/magicmonty/overtone.device.launchkey-mini"
 
