@@ -61,6 +61,21 @@ Bind a meta-key (no effect in session mode):
 (bind :default :up (fn [launchkeymini] (println launchkeymini)))
 ```
 
+Bind the knobs:
+```clojure
+; no arguments
+(bind :default :knob1 (fn [] (println "Knob 1 value changed")))
+
+; 1 argument: float value between 0.0 an 1.0
+(bind :default :knob2 (fn [val-f] (println (str "Knob 2: " val-f))))
+
+; 2 arguments: float value between 0.0 an 1.0 and absolute value between 0 and 127
+(bind :default :knob3 (fn [val-f val] (println (str "Knob 3: " val " / " val-f))))
+
+; 3 arguments: device, float value between 0.0 an 1.0 and absolute value between 0 and 127
+(bind :default :knob4 (fn [lk val-f val] (println (str "Knob 4 on " lk ": " val " / " val-f))))
+```
+
 ## Events
 
 ### Meta-keys

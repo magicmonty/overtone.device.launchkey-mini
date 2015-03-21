@@ -254,16 +254,21 @@
       (Thread/sleep 50)))
   (reset-launchkey* sink))
 
+(defn- invoke-trigger-fn
+  ([launchkeymini column row] (invoke-trigger-fn launchkeymini (str column "x" row)))
+  ([launchkeymini id]
+   (when-let [trigger-fn (state-maps/trigger-fn (:state launchkeymini) id)]
+     (if (= 0 (arg-count trigger-fn))
+       (trigger-fn)
+       (trigger-fn launchkeymini)))))
+
 (defn- make-grid-on-event-handler [launchkeymini idx state column row note]
   (fn [_]
     (state-maps/toggle! state column row)
     (if (state-maps/session-mode? state (state-maps/mode state))
       (toggle-led launchkeymini [column row] (state-maps/cell state column row))
       (led-on launchkeymini [column row] led/full-brightness :red))
-    (when-let [trigger-fn (state-maps/trigger-fn state column row)]
-      (if (= 0 (arg-count trigger-fn))
-        (trigger-fn)
-        (trigger-fn launchkeymini)))
+    (invoke-trigger-fn launchkeymini column row)
     (let [current-mode (state-maps/mode state)]
       (event [launchkeymini-event-id idx current-mode :grid-on]
              :id [column row]
@@ -303,10 +308,7 @@
   (fn [_]
     (state-maps/toggle-side! state (side->row id))
     (toggle-led launchkeymini id (state-maps/side-cell state (side->row id)))
-    (when-let [trigger-fn (state-maps/trigger-fn state id)]
-      (if (= 0 (arg-count trigger-fn))
-        (trigger-fn)
-        (trigger-fn launchkeymini)))))
+    (invoke-trigger-fn launchkeymini id)))
 
 (defn- bind-side-events [launchkeymini device-key interfaces state]
   (doseq [[id side-info] (-> interfaces :grid-controls :side-controls)]
@@ -329,10 +331,7 @@
       (render-state launchkeymini))
 
       ;bindable if not in session mode
-      (when-let [trigger-fn (state-maps/trigger-fn current-state id)]
-         (if (= 0 (arg-count trigger-fn))
-           (trigger-fn)
-           (trigger-fn launchkeymini))))
+      (invoke-trigger-fn launchkeymini id))
 
     (event [launchkeymini-event-id idx current-mode :meta (keyword (subs (str id "-on") 1))]
            :val value
@@ -352,23 +351,57 @@
 (defn- bind-metakey-events [launchkeymini device-key idx interfaces]
   (doseq [[id meta-key-info] (-> interfaces :grid-controls :meta-keys)]
     (let [current-state (:state launchkeymini)
-          current-mode  (state-maps/mode current-state)
           type          (:type meta-key-info)
           note          (:note meta-key-info)
           on-handle     (concat device-key [type note])
           on-fn (fn [{:keys [data2-f]}]
-            (if (zero? data2-f)
-              (on-metakey-off launchkeymini idx id data2-f)
-              (on-metakey-on  launchkeymini idx interfaces id data2-f))
+            (let [current-mode (state-maps/mode current-state)]
+              (if (zero? data2-f)
+                (on-metakey-off launchkeymini idx id data2-f)
+                (on-metakey-on  launchkeymini idx interfaces id data2-f))
 
-              (event [launchkeymini-event-id idx current-state :meta id]
-                      :val data2-f
-                      :id id
-                      :launchkeymini launchkeymini
-                      :idx idx))]
+              (event [launchkeymini-event-id idx current-mode :meta id]
+                     :val data2-f
+                     :id id
+                     :launchkeymini launchkeymini
+                     :idx idx)))]
 
       (println :handle on-handle)
       (oevent/on-event on-handle on-fn (str "metakey-on-event-for" on-handle)))))
+
+(defn- make-knob-event-handler [launchkeymini idx state id]
+  (fn [{:keys [data2-f data2]}]
+    (when-let [trigger-fn   (state-maps/trigger-fn state id)]
+      (when (= 0 (arg-count trigger-fn))
+        (trigger-fn))
+
+      (when (= 1 (arg-count trigger-fn))
+        (trigger-fn data2-f))
+
+      (when (= 2 (arg-count trigger-fn))
+        (trigger-fn data2-f data2))
+
+      (when (= 3 (arg-count trigger-fn))
+        (trigger-fn launchkeymini data2-f data2)))
+
+    (let [current-mode (state-maps/mode state)]
+      (event [launchkeymini-event-id idx current-mode :knob id]
+             :val data2-f
+             :val-abs data2
+             :id id
+             :launchkeymini launchkeymini
+             :idx idx))))
+
+(defn- bind-knob-events [launchkeymini device-key idx interfaces]
+  (doseq [[id knob-info] (-> interfaces :grid-controls :knobs)]
+    (let [current-state (:state launchkeymini)
+          type          (:type knob-info)
+          note          (:note knob-info)
+          handle        (concat device-key [type note])
+          on-fn (make-knob-event-handler launchkeymini idx current-state id)]
+
+      (println :handle handle)
+      (oevent/on-event handle on-fn (str "knob-event-for" handle)))))
 
 (defn- register-event-handlers-for-launchkeymini [device sink idx]
   (let [launchkeymini  (map->LaunchkeyMini (assoc device :rcv sink))
@@ -378,6 +411,7 @@
     (bind-grid-events    launchkeymini device-key idx state)
     (bind-side-events    launchkeymini device-key interfaces state)
     (bind-metakey-events launchkeymini device-key idx interfaces)
+    (bind-knob-events    launchkeymini device-key idx interfaces)
     launchkeymini))
 
 (defn stateful-launchkeymini [device]
