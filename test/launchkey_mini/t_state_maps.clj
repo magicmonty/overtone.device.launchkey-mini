@@ -459,6 +459,17 @@
                                                                                         [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]]}}
                                                                :page-coords [1 0]})
 
+(fact "shift-page-right doesn't increment x-coordinate of page if page-max-x is set and current page is last page"
+      (@#'sm/shift-page-right (atom {:active :default
+                                     :modes {:default {:grid [[0 0 0 0 0 0 0 0]
+                                                              [0 0 0 0 0 0 0 0]]
+                                                       :page-max-x 0}}
+                                     :page-coords [0 0]})) => {:active :default
+                                                               :modes {:default {:grid [[0 0 0 0 0 0 0 0]
+                                                                                        [0 0 0 0 0 0 0 0]]
+                                                                                 :page-max-x 0}}
+                                                               :page-coords [0 0]})
+
 (fact "shift-page-up decrements y-coordinate of page"
       (@#'sm/shift-page-up (atom {:page-coords [2 3]})) => {:page-coords [2 2]})
 
@@ -494,6 +505,28 @@
                                                                                        [0 0]]}}
                                                               :page-coords [0 1]})
 
+(fact "shift-page-down doesn't increment y-coordinate of page if page-max-y is set and current page is last page"
+      (@#'sm/shift-page-down (atom {:active :default
+                                    :modes {:default {:grid [[0 0 0 0 0 0 0 0]
+                                                             [0 0 0 0 0 0 0 0]]
+                                                      :side [[0 0]]
+                                                      :page-max-y 0}}
+                                    :page-coords [0 0]})) => {:active :default
+                                                              :modes {:default {:grid [[0 0 0 0 0 0 0 0]
+                                                                                       [0 0 0 0 0 0 0 0]]
+                                                                                :side [[0 0]]
+                                                                                :page-max-y 0}}
+                                                              :page-coords [0 0]})
+
+(fact "set-page-max-x adds page-max-x to state"
+      (@#'sm/set-page-max-x (atom {:active :default
+                                   :modes {:default {}}}) 5) => {:active :default
+                                                                 :modes {:default {:page-max-x 5}}})
+
+(fact "set-page-max-y adds page-max-y to state"
+      (@#'sm/set-page-max-y (atom {:active :default
+                                   :modes {:default {}}}) 5) => {:active :default
+                                                                 :modes {:default {:page-max-y 5}}})
 
 (def test-state {:active :default
                  :modes {:default {:grid [[0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
