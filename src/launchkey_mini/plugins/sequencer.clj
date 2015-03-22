@@ -1,5 +1,5 @@
 (ns launchkey-mini.plugins.sequencer
-  (:use overtone.live))
+  (:use overtone.core))
 
 (defsynth phasor-skipping-sequencer
   "Supports looping and jumping position"

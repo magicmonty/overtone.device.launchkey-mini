@@ -14,15 +14,15 @@
 
 (def phrase-size 16)
 
-(defn toggle-rows [launchkeymini sequencer]
-  (doseq [absolute-row (range 0 (state-maps/y-max (:state launchkeymini)))]
-    (toggle-row launchkeymini sequencer absolute-row)))
-
 (defn toggle-row [launchkeymini sequencer absolute-row]
   (let [state (:state launchkeymini)]
     (if (state-maps/absolute-row-active? state absolute-row)
       (sequencer-write! sequencer absolute-row (take phrase-size (state-maps/complete-row state absolute-row)))
       (reset-pattern! sequencer absolute-row))))
+
+(defn toggle-rows [launchkeymini sequencer]
+  (doseq [absolute-row (range 0 (state-maps/y-max (:state launchkeymini)))]
+    (toggle-row launchkeymini sequencer absolute-row)))
 
 (defn render-state-with-beat
   ([launchkeymini mode-id]
